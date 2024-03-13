@@ -3,21 +3,20 @@ package bot.chessbot;
 import java.util.ArrayList;
 
 public abstract class Piece {
-    private int row;
-    private int column;
-    private String color;
 
+    String color;
+    String image;
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getColumn() {
-        return row;
-    }
 
     public String getColor() {
         return color;
+    }
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String string) {
+        image = string;
     }
 
     public abstract ArrayList<int[]> getValidMoves();

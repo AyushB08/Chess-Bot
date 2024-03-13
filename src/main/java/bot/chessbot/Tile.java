@@ -62,14 +62,26 @@ public class Tile extends StackPane {
         rectangle.setHeight(tileSize);
         rectangle.setFill(color);
 
-        Image image = new Image(new FileInputStream("src/main/resources/images/Chess_bdt60.png"));  ;
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(40);
-        imageView.setFitWidth(40);
+        if (this.occupied) {
+            System.out.println(piece.getImage());
+
+            Image image = new Image(new FileInputStream(piece.getImage()));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(40);
+            imageView.setFitWidth(40);
+
+            this.getChildren().clear();
+            this.getChildren().addAll(rectangle, imageView);
+
+        } else {
+            this.getChildren().clear();
+            this.getChildren().addAll(rectangle);
+        }
 
 
-        this.getChildren().clear();
-        this.getChildren().addAll(rectangle, imageView);
+
+
+
     }
 
 
