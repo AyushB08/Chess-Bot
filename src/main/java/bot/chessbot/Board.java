@@ -67,6 +67,8 @@ public class Board extends Group {
 
         board = new Tile[8][8];
 
+
+        /*
         for (int i = 0; i <= 7; i++) {
             for (int a = 0; a <= 7; a++) {
                 Tile tile;
@@ -86,6 +88,8 @@ public class Board extends Group {
                 this.getChildren().add(tile);
             }
         }
+
+         */
     }
 
     public void createBoard() {
