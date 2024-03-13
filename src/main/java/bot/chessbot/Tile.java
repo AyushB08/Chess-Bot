@@ -6,25 +6,38 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Tile extends StackPane {
     private int row;
     private int column;
     private double tileSize;
     private Color color;
+    private Color activated;
     private boolean occupied;
     private Piece piece;
 
-    public Tile(int row, int col, double tileSize, Color color, boolean occupied, Piece piece) throws FileNotFoundException {
+    private boolean isActive;
+
+
+
+
+    public Tile(int row, int col, double tileSize, Color color, Color activated, boolean occupied, Piece piece) throws IOException {
 
         this.row = row;
         this.column = col;
         this.tileSize = tileSize;
         this.color = color;
+        this.activated = activated;
         this.occupied = occupied;
         this.piece = piece;
+
+
+        isActive = false;
+
 
         drawTile();
 
@@ -56,16 +69,39 @@ public class Tile extends StackPane {
         return tileSize;
     }
 
-    public void drawTile() throws FileNotFoundException {
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean b) {
+        isActive = b;
+    }
+
+    public void onClicked() {
+        if (!isActive) {
+            isActive = true;
+        }
+    }
+
+    public void drawTile() throws IOException {
+
         Rectangle rectangle = new Rectangle();
         rectangle.setWidth(tileSize);
         rectangle.setHeight(tileSize);
-        rectangle.setFill(color);
+        if (isActive) {
+            rectangle.setFill(activated);
+        } else {
+            rectangle.setFill(color);
+        }
+
 
         if (this.occupied) {
-            System.out.println(piece.getImage());
 
-            Image image = new Image(new FileInputStream(piece.getImage()));
+
+
+            FileInputStream fileInput = new FileInputStream(piece.getImage());
+            Image image = new Image(fileInput);
+            fileInput.close();
             ImageView imageView = new ImageView(image);
             imageView.setFitHeight(40);
             imageView.setFitWidth(40);
@@ -77,12 +113,8 @@ public class Tile extends StackPane {
             this.getChildren().clear();
             this.getChildren().addAll(rectangle);
         }
-
-
-
-
-
     }
+
 
 
 }
