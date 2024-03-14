@@ -14,6 +14,11 @@ import java.io.IOException;
 public class BoardViewer extends Application {
 
     Board board;
+    boolean selectedTileBool = false;
+    Tile selectedTile;
+
+    public BoardViewer() throws IOException {
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -45,27 +50,62 @@ public class BoardViewer extends Application {
             int row = board.rowForYPos(e.getY());
             int col = board.colForXPos(e.getX());
 
-            Tile tile = board.getTile(row, col);
+            if (selectedTileBool && (selectedTile.getColumn() != col || selectedTile.getRow() != row)) {
+                selectedTileBool = false;
+                board.getTile(row, col).setPiece(selectedTile.getPiece());
+                board.getTile(row, col).setOccupied(true);
+                selectedTile.setPiece(null);
+                selectedTile.setOccupied(false);
 
-            if (tile.getIsActive()) {
-
+                board.setTurn(board.getTurn()+1);
                 try {
                     board.removeActiveTiles();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+            } else {
+                Tile tile = board.getTile(row, col);
 
-            } else{
-                try {
-                    board.removeActiveTiles();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                if (tile.isOccupied()) {
-                    tile.onClicked();
-                }
+                if (tile.getIsActive()) {
 
+                    try {
+                        board.removeActiveTiles();
+                        selectedTileBool = false;
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                } else{
+                    try {
+                        board.removeActiveTiles();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    if (board.getTurn() % 2 == 1) {
+                        if (tile.isOccupied()) {
+                            if (tile.getPiece().getColor().equals("white")) {
+                                tile.onClicked();
+                                selectedTile = board.getTile(row, col);
+                                selectedTileBool = true;
+                            }
+
+                        }
+                    } else {
+                        if (tile.isOccupied()) {
+                            if (tile.getPiece().getColor().equals("black")) {
+                                tile.onClicked();
+                                selectedTile = board.getTile(row, col);
+                                selectedTileBool = true;
+                            }
+
+                        }
+                    }
+
+
+                }
             }
+
+
 
 
             try {
@@ -73,6 +113,8 @@ public class BoardViewer extends Application {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
+
 
         }
     }

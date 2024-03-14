@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 public class Knight extends Piece{
 
-    public Knight(String color) {
+    public Knight(int row, int col, String color) {
+        this.row = row;
+        this.col = col;
         this.color = color;
         if (color.equals("white")) {
             setImage("src/main/resources/images/white-knight.png");

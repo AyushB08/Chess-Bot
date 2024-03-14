@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 public class Pawn extends Piece{
 
-    public Pawn(String color) {
+    public Pawn(int row, int col, String color) {
+        this.row = row;
+        this.col = col;
         this.color = color;
         if (color.equals("white")) {
             setImage("src/main/resources/images/white-pawn.png");
@@ -15,6 +17,11 @@ public class Pawn extends Piece{
 
     @Override
     public ArrayList<int[]> getValidMoves() {
-        return null;
+
+        ArrayList<int[]> moves = new ArrayList<>();
+        return moves;
     }
+
+
+
 }

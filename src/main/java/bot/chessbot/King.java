@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 public class King extends Piece{
 
-    public King(String color) {
+    public King(int row, int col, String color) {
+        this.row = row;
+        this.col = col;
         this.color = color;
         if (color.equals("white")) {
             setImage("src/main/resources/images/white-king.png");

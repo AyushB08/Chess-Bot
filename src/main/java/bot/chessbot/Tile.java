@@ -45,6 +45,13 @@ public class Tile extends StackPane {
 
     }
 
+    public void setPiece(Piece piece) {
+        this.piece = piece;
+    }
+
+    public void setOccupied(boolean x) {
+        occupied = x;
+    }
     public boolean isOccupied() {
         return occupied;
     }

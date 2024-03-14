@@ -21,7 +21,7 @@ public class Board extends Group {
     private final Color activatedOne;
     private final Color activatedTwo;
 
-    private int turn = 0;
+    private int turn = 1;
 
 
     public Board() throws IOException {
@@ -57,6 +57,14 @@ public class Board extends Group {
 
     public double xPosForCol(int col) {
         return col * tileSize;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int x) {
+        turn = x;
     }
 
 
@@ -106,23 +114,23 @@ public class Board extends Group {
 
         board = new Tile[8][8];
 
-        Tile black_tile_one = new Tile(7, 0, tileSize, colorOne, activatedOne, true, new Rook("black"));
-        Tile black_tile_two = new Tile(7, 1, tileSize, colorTwo, activatedTwo, true, new Knight("black"));
-        Tile black_tile_three = new Tile(7, 2, tileSize, colorOne, activatedOne, true, new Bishop("black"));
-        Tile black_tile_four = new Tile(7, 3, tileSize, colorTwo, activatedTwo, true, new Queen("black"));
-        Tile black_tile_five = new Tile(7, 4, tileSize, colorOne, activatedOne, true, new King("black"));
-        Tile black_tile_six = new Tile(7,5, tileSize, colorTwo, activatedTwo, true, new Bishop("black"));
-        Tile black_tile_seven = new Tile(7, 6, tileSize, colorOne, activatedOne, true, new Knight("black"));
-        Tile black_tile_eight = new Tile(7, 7, tileSize, colorTwo, activatedTwo, true, new Rook("black"));
+        Tile black_tile_one = new Tile(7, 0, tileSize, colorOne, activatedOne, true, new Rook(7, 0, "black"));
+        Tile black_tile_two = new Tile(7, 1, tileSize, colorTwo, activatedTwo, true, new Knight(7, 1, "black"));
+        Tile black_tile_three = new Tile(7, 2, tileSize, colorOne, activatedOne, true, new Bishop(7, 2, "black"));
+        Tile black_tile_four = new Tile(7, 3, tileSize, colorTwo, activatedTwo, true, new Queen(7, 3, "black"));
+        Tile black_tile_five = new Tile(7, 4, tileSize, colorOne, activatedOne, true, new King(7, 4, "black"));
+        Tile black_tile_six = new Tile(7,5, tileSize, colorTwo, activatedTwo, true, new Bishop(7, 5, "black"));
+        Tile black_tile_seven = new Tile(7, 6, tileSize, colorOne, activatedOne, true, new Knight(7, 6, "black"));
+        Tile black_tile_eight = new Tile(7, 7, tileSize, colorTwo, activatedTwo, true, new Rook(7, 7, "black"));
 
-        Tile black_pawn_one = new Tile(6, 0, tileSize, colorTwo, activatedTwo, true, new Pawn("black"));
-        Tile black_pawn_two = new Tile(6, 1, tileSize, colorOne, activatedOne, true, new Pawn("black"));
-        Tile black_pawn_three = new Tile(6, 2, tileSize, colorTwo, activatedTwo, true, new Pawn("black"));
-        Tile black_pawn_four = new Tile(6, 3, tileSize, colorOne, activatedOne, true, new Pawn("black"));
-        Tile black_pawn_five = new Tile(6, 4, tileSize, colorTwo, activatedTwo, true, new Pawn("black"));
-        Tile black_pawn_six = new Tile(6, 5, tileSize, colorOne , activatedOne, true, new Pawn("black"));
-        Tile black_pawn_seven = new Tile(6, 6, tileSize, colorTwo, activatedTwo, true, new Pawn("black"));
-        Tile black_pawn_eight = new Tile(6, 7, tileSize, colorOne, activatedOne, true, new Pawn("black"));
+        Tile black_pawn_one = new Tile(6, 0, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 0, "black"));
+        Tile black_pawn_two = new Tile(6, 1, tileSize, colorOne, activatedOne, true, new Pawn(6, 1, "black"));
+        Tile black_pawn_three = new Tile(6, 2, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 2, "black"));
+        Tile black_pawn_four = new Tile(6, 3, tileSize, colorOne, activatedOne, true, new Pawn(6, 3, "black"));
+        Tile black_pawn_five = new Tile(6, 4, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 4, "black"));
+        Tile black_pawn_six = new Tile(6, 5, tileSize, colorOne , activatedOne, true, new Pawn(6, 5, "black"));
+        Tile black_pawn_seven = new Tile(6, 6, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 6, "black"));
+        Tile black_pawn_eight = new Tile(6, 7, tileSize, colorOne, activatedOne, true, new Pawn(6, 7, "black"));
 
         setTile(black_tile_one);
         setTile(black_tile_two);
@@ -157,23 +165,23 @@ public class Board extends Group {
             }
         }
 
-        Tile white_tile_one = new Tile(0, 0, tileSize, colorTwo, activatedTwo ,true, new Rook("white"));
-        Tile white_tile_two = new Tile(0, 1, tileSize, colorOne, activatedOne, true, new Knight("white"));
-        Tile white_tile_three = new Tile(0, 2, tileSize, colorTwo, activatedTwo, true, new Bishop("white"));
-        Tile white_tile_four = new Tile(0, 3, tileSize, colorOne, activatedOne, true, new Queen("white"));
-        Tile white_tile_five = new Tile(0, 4, tileSize, colorTwo, activatedTwo, true, new King("white"));
-        Tile white_tile_six = new Tile(0,5, tileSize, colorOne, activatedOne, true, new Bishop("white"));
-        Tile white_tile_seven = new Tile(0, 6, tileSize, colorTwo, activatedTwo, true, new Knight("white"));
-        Tile white_tile_eight = new Tile(0, 7, tileSize, colorOne, activatedOne, true, new Rook("white"));
+        Tile white_tile_one = new Tile(0, 0, tileSize, colorTwo, activatedTwo ,true, new Rook(0, 0, "white"));
+        Tile white_tile_two = new Tile(0, 1, tileSize, colorOne, activatedOne, true, new Knight(0, 1, "white"));
+        Tile white_tile_three = new Tile(0, 2, tileSize, colorTwo, activatedTwo, true, new Bishop(0, 2, "white"));
+        Tile white_tile_four = new Tile(0, 3, tileSize, colorOne, activatedOne, true, new Queen(0, 3, "white"));
+        Tile white_tile_five = new Tile(0, 4, tileSize, colorTwo, activatedTwo, true, new King(0, 4 ,"white"));
+        Tile white_tile_six = new Tile(0,5, tileSize, colorOne, activatedOne, true, new Bishop(0, 5, "white"));
+        Tile white_tile_seven = new Tile(0, 6, tileSize, colorTwo, activatedTwo, true, new Knight(0, 6, "white"));
+        Tile white_tile_eight = new Tile(0, 7, tileSize, colorOne, activatedOne, true, new Rook(0, 7, "white"));
 
-        Tile white_pawn_one = new Tile(1, 0, tileSize, colorOne, activatedOne, true, new Pawn("white"));
-        Tile white_pawn_two = new Tile(1, 1, tileSize, colorTwo, activatedTwo, true, new Pawn("white"));
-        Tile white_pawn_three = new Tile(1, 2, tileSize, colorOne, activatedOne, true, new Pawn("white"));
-        Tile white_pawn_four = new Tile(1, 3, tileSize, colorTwo, activatedTwo, true, new Pawn("white"));
-        Tile white_pawn_five = new Tile(1, 4, tileSize, colorOne, activatedOne, true, new Pawn("white"));
-        Tile white_pawn_six = new Tile(1, 5, tileSize, colorTwo, activatedTwo, true, new Pawn("white"));
-        Tile white_pawn_seven = new Tile(1, 6, tileSize, colorOne, activatedOne, true, new Pawn("white"));
-        Tile white_pawn_eight = new Tile(1, 7, tileSize, colorTwo, activatedTwo, true, new Pawn("white"));
+        Tile white_pawn_one = new Tile(1, 0, tileSize, colorOne, activatedOne, true, new Pawn(1, 0, "white"));
+        Tile white_pawn_two = new Tile(1, 1, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 1, "white"));
+        Tile white_pawn_three = new Tile(1, 2, tileSize, colorOne, activatedOne, true, new Pawn(1, 2, "white"));
+        Tile white_pawn_four = new Tile(1, 3, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 3, "white"));
+        Tile white_pawn_five = new Tile(1, 4, tileSize, colorOne, activatedOne, true, new Pawn(1, 4, "white"));
+        Tile white_pawn_six = new Tile(1, 5, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 5, "white"));
+        Tile white_pawn_seven = new Tile(1, 6, tileSize, colorOne, activatedOne, true, new Pawn(1, 6, "white"));
+        Tile white_pawn_eight = new Tile(1, 7, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 7 , "white"));
 
 
         setTile(white_tile_one);
