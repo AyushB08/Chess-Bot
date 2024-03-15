@@ -10,10 +10,12 @@ import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BoardViewer extends Application {
 
-    Board board;
+    static Board board;
     boolean selectedTileBool = false;
     Tile selectedTile;
 
@@ -51,13 +53,33 @@ public class BoardViewer extends Application {
             int col = board.colForXPos(e.getX());
 
             if (selectedTileBool && (selectedTile.getColumn() != col || selectedTile.getRow() != row)) {
-                selectedTileBool = false;
-                board.getTile(row, col).setPiece(selectedTile.getPiece());
-                board.getTile(row, col).setOccupied(true);
-                selectedTile.setPiece(null);
-                selectedTile.setOccupied(false);
 
-                board.setTurn(board.getTurn()+1);
+                ArrayList<int[]> moves = selectedTile.getPiece().getValidMoves();
+
+
+                for (int i = 0; i < moves.size(); i++) {
+                    System.out.println(Arrays.toString(moves.get(i)) + " row: " + row + " col: " + col);
+                    if (moves.get(i)[0] == row && moves.get(i)[1] == col) {
+                        System.out.println("went here");
+
+                        selectedTileBool = false;
+                        board.getTile(row, col).setPiece(selectedTile.getPiece());
+                        board.getTile(row, col).setOccupied(true);
+                        selectedTile.getPiece().setRow(row);
+                        selectedTile.getPiece().setCol(col);
+                        selectedTile.setPiece(null);
+                        selectedTile.setOccupied(false);
+
+                        board.setTurn(board.getTurn()+1);
+                        break;
+                    }
+
+
+                }
+
+                selectedTileBool = false;
+
+
                 try {
                     board.removeActiveTiles();
                 } catch (IOException ex) {
@@ -117,5 +139,9 @@ public class BoardViewer extends Application {
 
 
         }
+    }
+
+    public static Board getBoard() {
+        return board;
     }
 }
