@@ -1,16 +1,24 @@
 package bot.chessbot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static bot.chessbot.BoardViewer.board;
 
 public class Rook extends Piece{
 
+    String rookCastle;
+    boolean canCastle = true;
+
     public Rook(int row, int col, String color) {
         this.row = row;
         this.col = col;
-
         this.color = color;
+        if (col == 7) {
+            rookCastle = "king";
+        } else {
+            rookCastle = "queen";
+        }
         if (color.equals("white")) {
             setImage("src/main/resources/images/white-rook.png");
         } else {
@@ -19,14 +27,37 @@ public class Rook extends Piece{
     }
 
     @Override
-    public ArrayList<int[]> getValidMoves() {
+    public ArrayList<int[]> getValidMoves(Board board) throws IOException {
         ArrayList<int[]> moves = new ArrayList<>();
-        getHorizontalMoves(moves);
-        getVerticalMoves(moves);
-        return moves;
+        getHorizontalMoves(moves, board);
+        getVerticalMoves(moves, board);
+
+
+        return (moves);
+
     }
 
-    public void getHorizontalMoves(ArrayList<int[]> array) {
+    @Override
+    public Piece clonePiece(Piece x) {
+        Rook rook = new Rook(row, col, color);
+        rook.setCastle(rook.getCanCastle());
+        rook.rookCastle = this.rookCastle;
+        return rook;
+    }
+
+    public boolean getCanCastle() {
+        return canCastle;
+    }
+
+    public void setCastle(boolean x) {
+        canCastle = x;
+    }
+
+    public String getRookCastle() {
+        return rookCastle;
+    }
+
+    public void getHorizontalMoves(ArrayList<int[]> array, Board board) {
 
         for (int i = col-1; i >= 0; i--) {
 
@@ -69,7 +100,7 @@ public class Rook extends Piece{
         }
     }
 
-    public void getVerticalMoves(ArrayList<int[]> array) {
+    public void getVerticalMoves(ArrayList<int[]> array, Board board) {
         for (int i = row-1; i >= 0; i--) {
 
             int[] move = {i, col};

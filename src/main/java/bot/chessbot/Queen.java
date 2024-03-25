@@ -1,5 +1,6 @@
 package bot.chessbot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static bot.chessbot.BoardViewer.board;
@@ -18,17 +19,28 @@ public class Queen extends Piece{
     }
 
     @Override
-    public ArrayList<int[]> getValidMoves() {
+    public ArrayList<int[]> getValidMoves(Board board) throws IOException {
         ArrayList<int[]> moves = new ArrayList<>();
-        getVerticalMoves(moves);
-        getHorizontalMoves(moves);
-        getForwardDiagonal(moves);
-        getBackwardDiagonal(moves);
-        return moves;
+        getVerticalMoves(moves, board);
+        getHorizontalMoves(moves, board);
+        getForwardDiagonal(moves, board);
+        getBackwardDiagonal(moves, board);
+
+
+
+
+        return (moves);
+
+
 
     }
 
-    public void getBackwardDiagonal(ArrayList<int[]> array) {
+    @Override
+    public Piece clonePiece(Piece x) {
+        return new Queen(row, col, color);
+    }
+
+    public void getBackwardDiagonal(ArrayList<int[]> array, Board board) {
         int maxDiagonalTopLeftSteps = Math.min(7-row, col);
 
         for (int i = 0; i < maxDiagonalTopLeftSteps; i++) {
@@ -81,7 +93,7 @@ public class Queen extends Piece{
 
     }
 
-    public void getForwardDiagonal(ArrayList<int[]> array) {
+    public void getForwardDiagonal(ArrayList<int[]> array, Board board) {
         int maxDiagonalTopRightSteps = Math.min(7-row, 7-col);
 
         for (int i = 0; i < maxDiagonalTopRightSteps; i++) {
@@ -109,12 +121,12 @@ public class Queen extends Piece{
 
         int maxDiagonalBottomLeftSteps = Math.min(row, col);
 
-        System.out.println(maxDiagonalBottomLeftSteps);
+
 
         for (int i = 0; i < maxDiagonalBottomLeftSteps; i++) {
 
             int[] move = {row - 1 - i, col - 1 - i};
-            System.out.println(move[0] + " " + move[1]);
+
             if (board.getTile(row - 1 - i, col - 1 - i).isOccupied()) {
 
 
@@ -136,7 +148,7 @@ public class Queen extends Piece{
 
     }
 
-    public void getHorizontalMoves(ArrayList<int[]> array) {
+    public void getHorizontalMoves(ArrayList<int[]> array, Board board) {
 
         for (int i = col-1; i >= 0; i--) {
 
@@ -179,7 +191,7 @@ public class Queen extends Piece{
         }
     }
 
-    public void getVerticalMoves(ArrayList<int[]> array) {
+    public void getVerticalMoves(ArrayList<int[]> array, Board board) {
         for (int i = row-1; i >= 0; i--) {
 
             int[] move = {i, col};

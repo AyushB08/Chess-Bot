@@ -1,5 +1,6 @@
 package bot.chessbot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static bot.chessbot.BoardViewer.board;
@@ -16,19 +17,27 @@ public class Bishop extends Piece{
             setImage("src/main/resources/images/black-bishop.png");
         }
     }
+
     @Override
-    public ArrayList<int[]> getValidMoves() {
+    public ArrayList<int[]> getValidMoves(Board board) throws IOException {
 
         ArrayList<int[]> possibleMoves = new ArrayList<>();
-        getForwardDiagonal(possibleMoves);
-        getBackwardDiagonal(possibleMoves);
+        getForwardDiagonal(possibleMoves, board);
+        getBackwardDiagonal(possibleMoves, board);
+
 
 
         return possibleMoves;
+
     }
 
+    @Override
+    public Piece clonePiece(Piece x) {
 
-    public void getBackwardDiagonal(ArrayList<int[]> array) {
+        return new Bishop(row, col, color);
+    }
+
+    public void getBackwardDiagonal(ArrayList<int[]> array, Board board) {
         int maxDiagonalTopLeftSteps = Math.min(7-row, col);
 
         for (int i = 0; i < maxDiagonalTopLeftSteps; i++) {
@@ -81,7 +90,7 @@ public class Bishop extends Piece{
 
     }
 
-    public void getForwardDiagonal(ArrayList<int[]> array) {
+    public void getForwardDiagonal(ArrayList<int[]> array, Board board) {
         int maxDiagonalTopRightSteps = Math.min(7-row, 7-col);
 
         for (int i = 0; i < maxDiagonalTopRightSteps; i++) {
@@ -109,12 +118,12 @@ public class Bishop extends Piece{
 
         int maxDiagonalBottomLeftSteps = Math.min(row, col);
 
-        System.out.println(maxDiagonalBottomLeftSteps);
+
 
         for (int i = 0; i < maxDiagonalBottomLeftSteps; i++) {
 
             int[] move = {row - 1 - i, col - 1 - i};
-            System.out.println(move[0] + " " + move[1]);
+
             if (board.getTile(row - 1 - i, col - 1 - i).isOccupied()) {
 
 

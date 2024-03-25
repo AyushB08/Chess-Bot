@@ -6,7 +6,8 @@ import javafx.scene.shape.Rectangle;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.concurrent.BrokenBarrierException;
+import java.util.ArrayList;
+
 
 public class Board extends Group {
     private Tile[][] board;
@@ -209,7 +210,369 @@ public class Board extends Group {
             for (int a = 0; a < 8; a++) {
                 Tile tile = getTile(i, a);
                 tile.setIsActive(false);
-                drawBoard();
+
+            }
+        }
+        drawBoard();
+    }
+
+    public boolean isWhiteKingInCheck(Board clone) throws IOException {
+
+        int[] kingLocation = {0, 0};
+
+
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (!clone.getTile(i, a).isOccupied()) {
+
+                } else {
+
+                }
+
+            }
+        }
+
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (clone.getTile(i, a).isOccupied()) {
+                    if (clone.getTile(i, a).getPiece().getName().equals("King") && clone.getTile(i, a).getPiece().getColor().equals("white")) {
+                        kingLocation[0] = i;
+                        kingLocation[1] = a;
+
+                    }
+                }
+            }
+        }
+
+
+
+
+        for (int i = 0 ; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (clone.getTile(i, a).isOccupied()) {
+                    Piece piece = clone.getTile(i, a).getPiece();
+                    if (piece.getColor().equals("black")) {
+                        ArrayList<int[]> moves = piece.getValidMoves(clone);
+                        for (int[] move : moves) {
+                            if (move[0] == kingLocation[0] && move[1] == kingLocation[1]) {
+
+                                return true;
+                            }
+                        }
+                    }
+
+
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+
+    public boolean isBlackKingInCheck(Board clone) throws IOException {
+        int[] kingLocation = {0, 0};
+
+
+
+
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (clone.getTile(i, a).isOccupied()) {
+                    if (clone.getTile(i, a).getPiece().getName().equals("King") && clone.getTile(i, a).getPiece().getColor().equals("black")) {
+                        kingLocation[0] = i;
+                        kingLocation[1] = a;
+
+                    }
+                }
+            }
+        }
+
+
+
+        for (int i = 0 ; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (clone.getTile(i, a).isOccupied()) {
+                    Piece piece = clone.getTile(i, a).getPiece();
+                    if (piece.getColor().equals("white")) {
+
+                        ArrayList<int[]> moves = piece.getValidMoves(clone);
+                        for (int[] move : moves) {
+                            if (move[0] == kingLocation[0] && move[1] == kingLocation[1]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Board cloneBoard(Board x) throws IOException {
+        Board clone = new Board();
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a  < 8; a++ ) {
+                clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)));
+            }
+        }
+        return clone;
+    }
+    public boolean testMove(Tile chosenTile, int row, int col) throws IOException {
+
+
+        Board clone = cloneBoard(this);
+
+        Tile selectedTile = chosenTile.cloneTile(chosenTile);
+
+        clone.setTile(selectedTile);
+
+        boolean moveDone = false;
+
+        if (selectedTile.getPiece().getName().equals("Pawn")) {
+            if (Math.abs(row - selectedTile.getRow()) == 2) {
+                Pawn pawn = (Pawn) selectedTile.getPiece();
+                pawn.set_en_passant(true);
+            } else if (Math.abs(row - selectedTile.getRow()) == 1 && Math.abs(col - selectedTile.getColumn()) == 1) {
+                if (!clone.getTile(row, col).isOccupied()) {
+                    Pawn pawn = (Pawn) selectedTile.getPiece();
+                    Tile tile = clone.getTile(selectedTile.getRow(), col);
+
+                    tile.setOccupied(false);
+                    selectedTile.setOccupied(false);
+                    pawn.setRow(row);
+                    pawn.setCol(col);
+
+                }
+
+                else if (row == 7) {
+
+
+                    Tile tile = clone.getTile(row, col);
+
+                    tile.setOccupied(true);
+                    selectedTile.setOccupied(false);
+
+                    Queen queen = new Queen(7, col, "white");
+                    tile.setPiece(queen);
+
+                    moveDone = true;
+
+
+                }
+                else if (row == 0) {
+
+
+                    Tile tile = clone.getTile(row, col);
+
+                    tile.setOccupied(true);
+                    selectedTile.setOccupied(false);
+
+                    Queen queen = new Queen(0, col, "black");
+                    tile.setPiece(queen);
+
+                    moveDone = true;
+
+
+                }
+            }
+
+
+
+        }
+        if (selectedTile.getPiece().getName().equals("Rook")) {
+
+            Rook rook = (Rook) selectedTile.getPiece();
+            rook.setCastle(false);
+        }
+        if (selectedTile.getPiece().getName().equals("King")) {
+
+            King king = (King) selectedTile.getPiece();
+
+            if (king.canCastle) {
+
+
+                if (king.getColor().equals("white")) {
+                    if (row == 0 && col == 6) {
+                        Tile tile = clone.getTile(0, 7);
+                        Rook rook = (Rook) clone.getTile(0, 7).getPiece();
+
+                        tile.setOccupied(false);
+
+                        selectedTile.setOccupied(false);
+
+
+                        clone.getTile(0, 5).setOccupied(true);
+                        clone.getTile(0, 5).setPiece(rook);
+                        clone.getTile(0, 6).setOccupied(true);
+                        clone.getTile(0, 6).setPiece(king);
+
+                        king.setRow(0);
+                        king.setCol(6);
+                        rook.setRow(0);
+                        rook.setCol(5);
+
+
+                        moveDone = true;
+
+
+                    } else if (row == 0 && col == 2) {
+                        Tile tile = clone.getTile(0, 0);
+                        Rook rook = (Rook) clone.getTile(0, 0).getPiece();
+
+
+                        tile.setOccupied(false);
+                        selectedTile.setOccupied(false);
+
+
+                        clone.getTile(0, 2).setOccupied(true);
+                        clone.getTile(0, 2).setPiece(king);
+                        clone.getTile(0, 3).setOccupied(true);
+                        clone.getTile(0, 3).setPiece(rook);
+
+                        king.setRow(0);
+                        king.setCol(2);
+                        rook.setRow(0);
+                        rook.setCol(3);
+
+
+                        moveDone = true;
+
+
+                    }
+                } else {
+                    if (row == 7 && col == 6) {
+                        Tile tile = clone.getTile(7, 7);
+                        Rook rook = (Rook) clone.getTile(7, 7).getPiece();
+
+                        tile.setOccupied(false);
+                        selectedTile.setOccupied(false);
+
+
+                        clone.getTile(7, 5).setOccupied(true);
+                        clone.getTile(7, 5).setPiece(rook);
+                        clone.getTile(7, 6).setOccupied(true);
+                        clone.getTile(7, 6).setPiece(king);
+
+                        king.setRow(7);
+                        king.setCol(6);
+                        rook.setRow(7);
+                        rook.setCol(5);
+
+                        moveDone = true;
+
+
+
+                    } else if (row == 7 && col == 2) {
+                        Tile tile = clone.getTile(7, 0);
+                        Rook rook = (Rook) clone.getTile(7, 0).getPiece();
+
+                        tile.setOccupied(false);
+                        selectedTile.setOccupied(false);
+
+
+                        clone.getTile(7, 2).setOccupied(true);
+                        clone.getTile(7, 2).setPiece(king);
+
+                        clone.getTile(7, 3).setOccupied(true);
+                        clone.getTile(7, 3).setPiece(rook);
+
+                        king.setRow(7);
+                        king.setCol(2);
+                        rook.setRow(7);
+                        rook.setCol(3);
+
+
+                        moveDone = true;
+
+
+                    }
+                }
+
+
+            }
+
+            king.setCastle(false);
+
+
+        }
+
+
+
+        if (!moveDone) {
+
+
+            clone.getTile(row, col).setPiece(selectedTile.getPiece());
+            clone.getTile(row, col).setOccupied(true);
+            selectedTile.getPiece().setRow(row);
+            selectedTile.getPiece().setCol(col);
+            selectedTile.setPiece(null);
+            selectedTile.setOccupied(false);
+
+
+        }
+
+
+        if (clone.getTurn() % 2 == 1) {
+            clone.removeBlackPawnEnPassant();
+        } else {
+            clone.removeWhitePawnEnPassant();
+        }
+
+
+
+        if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
+
+            if (clone.isWhiteKingInCheck(clone)) {
+
+                return false;
+            }
+
+        }
+        else {
+            if (clone.isBlackKingInCheck(clone)) {
+
+                return false;
+            }
+
+        }
+
+
+        return true;
+    }
+
+
+
+
+    public void removeBlackPawnEnPassant() {
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    Piece piece = getTile(i, a).getPiece();
+                    if (piece.getName().equals("Pawn") && piece.color.equals("black")) {
+                        Pawn pawn = (Pawn) piece;
+                        pawn.set_en_passant(false);
+
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void removeWhitePawnEnPassant() {
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    Piece piece = getTile(i, a).getPiece();
+                    if (piece.getName().equals("Pawn") && piece.color.equals("white")) {
+                        Pawn pawn = (Pawn) piece;
+                        pawn.set_en_passant(false);
+                    }
+
+                }
             }
         }
     }

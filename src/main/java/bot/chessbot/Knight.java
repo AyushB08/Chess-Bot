@@ -1,5 +1,6 @@
 package bot.chessbot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static bot.chessbot.BoardViewer.board;
@@ -16,8 +17,14 @@ public class Knight extends Piece{
             setImage("src/main/resources/images/black-knight.png");
         }
     }
+
     @Override
-    public ArrayList<int[]> getValidMoves() {
+    public Piece clonePiece(Piece x) {
+        return new Knight(row, col, color);
+    }
+
+    @Override
+    public ArrayList<int[]> getValidMoves(Board board) throws IOException {
 
         ArrayList<int[]> moves = new ArrayList<>();
         moves.add(new int[]{row+1, col+2});
@@ -49,6 +56,9 @@ public class Knight extends Piece{
                 }
             }
         }
-        return possibleMoves;
+
+
+        return (possibleMoves);
+
     }
 }

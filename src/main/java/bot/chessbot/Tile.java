@@ -52,6 +52,15 @@ public class Tile extends StackPane {
     public void setOccupied(boolean x) {
         occupied = x;
     }
+
+    public Tile cloneTile(Tile x) throws IOException {
+        if (x.occupied) {
+            return new Tile(x.getRow(), x.getColumn(), x.getTileSize(), x.color, x.activated, x.occupied, x.piece.clonePiece(x.piece));
+        } else {
+            return new Tile(x.getRow(), x.getColumn(), x.getTileSize(), x.color, x.activated, x.occupied, null);
+        }
+
+    }
     public boolean isOccupied() {
         return occupied;
     }
