@@ -81,7 +81,7 @@ public class King extends Piece{
     }
 
 
-    public void getCastleMoves(ArrayList<int[]> array, Board board) {
+    public void getCastleMoves(ArrayList<int[]> array, Board board) throws IOException {
 
 
         ArrayList<Rook> rooks = new ArrayList<Rook>();
@@ -101,8 +101,9 @@ public class King extends Piece{
             }
 
             if (this.color.equals("white")) {
-                for (int i = 0; i < rooks.size(); i++) {
-                    Rook rook = rooks.get(i);
+
+
+                for (Rook rook : rooks) {
                     if (rook.getCanCastle()) {
                         if (rook.getRookCastle().equals("king")) {
                             if (!(board.getTile(0, 5).isOccupied()) && !(board.getTile(0, 6).isOccupied())) {
@@ -119,7 +120,13 @@ public class King extends Piece{
                     }
 
                 }
+
+
+
             } else {
+
+
+
                 for (int i = 0; i < rooks.size(); i++) {
                     Rook rook = rooks.get(i);
                     if (rook.getCanCastle()) {
@@ -138,6 +145,7 @@ public class King extends Piece{
                     }
 
                 }
+
             }
 
 

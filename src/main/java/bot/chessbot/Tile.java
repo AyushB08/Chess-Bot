@@ -119,8 +119,8 @@ public class Tile extends StackPane {
             Image image = new Image(fileInput);
             fileInput.close();
             ImageView imageView = new ImageView(image);
-            imageView.setFitHeight(40);
-            imageView.setFitWidth(40);
+            imageView.setFitHeight(65);
+            imageView.setFitWidth(65);
 
             this.getChildren().clear();
             this.getChildren().addAll(rectangle, imageView);

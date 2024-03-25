@@ -36,9 +36,9 @@ public class BoardViewer extends Application {
 
         root.setCenter(board);
 
-
-
-        Scene scene = new Scene(root, 600, 600);
+        Scene scene = new Scene(root, 640, 640);
+        stage.setTitle("Chess");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
 
@@ -90,7 +90,7 @@ public class BoardViewer extends Application {
 
                                     }
 
-                                    else if (row == 7) {
+                                    if (row == 7) {
 
 
                                         Tile tile = board.getTile(row, col);
@@ -122,6 +122,37 @@ public class BoardViewer extends Application {
                                     }
                                 }
 
+                                if (row == 7) {
+
+
+                                    Tile tile = board.getTile(row, col);
+
+                                    tile.setOccupied(true);
+                                    selectedTile.setOccupied(false);
+
+                                    Queen queen = new Queen(7, col, "white");
+                                    tile.setPiece(queen);
+
+                                    moveDone = true;
+
+
+                                }
+                                else if (row == 0) {
+
+
+                                    Tile tile = board.getTile(row, col);
+
+                                    tile.setOccupied(true);
+                                    selectedTile.setOccupied(false);
+
+                                    Queen queen = new Queen(0, col, "black");
+                                    tile.setPiece(queen);
+
+                                    moveDone = true;
+
+
+                                }
+
 
 
                             }
@@ -135,7 +166,6 @@ public class BoardViewer extends Application {
                                 King king = (King) selectedTile.getPiece();
 
                                 if (king.canCastle) {
-
 
                                     if (king.getColor().equals("white")) {
                                         if (row == 0 && col == 6) {
@@ -215,7 +245,6 @@ public class BoardViewer extends Application {
                                             tile.setOccupied(false);
                                             selectedTile.setOccupied(false);
 
-
                                             board.getTile(7, 2).setOccupied(true);
                                             board.getTile(7, 2).setPiece(king);
 
@@ -233,6 +262,8 @@ public class BoardViewer extends Application {
 
                                         }
                                     }
+
+
 
 
                                 }

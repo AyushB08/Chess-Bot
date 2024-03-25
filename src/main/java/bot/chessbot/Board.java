@@ -27,14 +27,14 @@ public class Board extends Group {
 
     public Board() throws IOException {
 
-        colorOne = Color.web("#B58863",1.0);
-        colorTwo = Color.web("#F0D9B5",1.0);
+        colorOne = Color.web("#F0D9B5",1.0);
+        colorTwo = Color.web("#B58863",1.0);
 
-        activatedOne = Color.web("829769", 1.0);
-        activatedTwo = Color.web("#646F40",1.0);
+        activatedOne = Color.web("#646F40",1.0);
+        activatedTwo = Color.web("829769", 1.0);
 
         playerIsWhite = true;
-        tileSize = 50;
+        tileSize = 80;
 
         board = new Tile[8][8];
 
@@ -347,7 +347,7 @@ public class Board extends Group {
 
                 }
 
-                else if (row == 7) {
+                if (row == 7) {
 
 
                     Tile tile = clone.getTile(row, col);
@@ -377,6 +377,36 @@ public class Board extends Group {
 
 
                 }
+            }
+            if (row == 7) {
+
+
+                Tile tile = clone.getTile(row, col);
+
+                tile.setOccupied(true);
+                selectedTile.setOccupied(false);
+
+                Queen queen = new Queen(7, col, "white");
+                tile.setPiece(queen);
+
+                moveDone = true;
+
+
+            }
+            else if (row == 0) {
+
+
+                Tile tile = clone.getTile(row, col);
+
+                tile.setOccupied(true);
+                selectedTile.setOccupied(false);
+
+                Queen queen = new Queen(0, col, "black");
+                tile.setPiece(queen);
+
+                moveDone = true;
+
+
             }
 
 
