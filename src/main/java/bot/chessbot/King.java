@@ -107,14 +107,60 @@ public class King extends Piece{
                     if (rook.getCanCastle()) {
                         if (rook.getRookCastle().equals("king")) {
                             if (!(board.getTile(0, 5).isOccupied()) && !(board.getTile(0, 6).isOccupied())) {
-                                int[] move = {0, 6};
-                                array.add(move);
+                                if (!board.isWhiteKingInCheck(board)) {
+
+                                    Board clone = board.cloneBoard(board);
+                                    King king = (King)(clone.getTile(0, 4).getPiece());
+                                    king.setCol(5);
+                                    clone.getTile(0, 4).setOccupied(false);
+                                    clone.getTile(0, 5).setOccupied(true);
+                                    clone.getTile(0, 5).setPiece(king);
+
+                                    if (!clone.isWhiteKingInCheck(clone)) {
+                                        Board clone_two = board.cloneBoard(board);
+                                        king = (King)(clone.getTile(0, 4).getPiece());
+                                        king.setCol(6);
+                                        clone.getTile(0, 4).setOccupied(false);
+                                        clone.getTile(0, 6).setOccupied(true);
+                                        clone.getTile(0, 6).setPiece(king);
+
+                                        if (!clone_two.isWhiteKingInCheck(clone_two)) {
+                                            int[] move = {0, 6};
+                                            array.add(move);
+                                        }
+                                    }
+
+
+                                }
+
                             }
                         }
                         if (rook.getRookCastle().equals("queen")) {
                             if (!(board.getTile(0, 1).isOccupied()) && !(board.getTile(0, 2).isOccupied()) && !(board.getTile(0, 3).isOccupied())) {
-                                int[] move = {0, 2};
-                                array.add(move);
+                                if (!board.isWhiteKingInCheck(board)) {
+
+                                    Board clone = board.cloneBoard(board);
+                                    King king = (King)(clone.getTile(0, 4).getPiece());
+                                    king.setCol(3);
+                                    clone.getTile(0, 4).setOccupied(false);
+                                    clone.getTile(0, 3).setOccupied(true);
+                                    clone.getTile(0, 3).setPiece(king);
+
+                                    if (!clone.isWhiteKingInCheck(clone)) {
+                                        Board clone_two = board.cloneBoard(board);
+                                        king = (King)(clone.getTile(0, 4).getPiece());
+                                        king.setCol(2);
+                                        clone.getTile(0, 4).setOccupied(false);
+                                        clone.getTile(0, 2).setOccupied(true);
+                                        clone.getTile(0, 2).setPiece(king);
+
+                                        if (!clone_two.isWhiteKingInCheck(clone_two)) {
+                                            int[] move = {0, 2};
+                                            array.add(move);
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -132,14 +178,58 @@ public class King extends Piece{
                     if (rook.getCanCastle()) {
                         if (rook.getRookCastle().equals("king")) {
                             if (!(board.getTile(7, 5).isOccupied()) && !(board.getTile(7, 6).isOccupied())) {
-                                int[] move = {7, 6};
-                                array.add(move);
+                                if (!board.isBlackKingInCheck(board)) {
+
+                                    Board clone = board.cloneBoard(board);
+                                    King king = (King)(clone.getTile(7, 4).getPiece());
+                                    king.setCol(5);
+                                    clone.getTile(7, 4).setOccupied(false);
+                                    clone.getTile(7, 5).setOccupied(true);
+                                    clone.getTile(7, 5).setPiece(king);
+
+                                    if (!clone.isBlackKingInCheck(clone)) {
+                                        Board clone_two = board.cloneBoard(board);
+                                        king = (King)(clone.getTile(0, 4).getPiece());
+                                        king.setCol(6);
+                                        clone.getTile(7, 4).setOccupied(false);
+                                        clone.getTile(7, 6).setOccupied(true);
+                                        clone.getTile(7, 6).setPiece(king);
+
+                                        if (!clone_two.isBlackKingInCheck(clone_two)) {
+                                            int[] move = {7, 6};
+                                            array.add(move);
+                                        }
+                                    }
+
+
+                                }
                             }
                         }
                         if (rook.getRookCastle().equals("queen")) {
                             if (!(board.getTile(7, 1).isOccupied()) && !(board.getTile(7, 2).isOccupied()) && !(board.getTile(7, 3).isOccupied())) {
-                                int[] move = {7, 2};
-                                array.add(move);
+                                if (!board.isBlackKingInCheck(board)) {
+
+                                    Board clone = board.cloneBoard(board);
+                                    King king = (King)(clone.getTile(7, 4).getPiece());
+                                    king.setCol(3);
+                                    clone.getTile(7, 4).setOccupied(false);
+                                    clone.getTile(7, 3).setOccupied(true);
+                                    clone.getTile(7, 3).setPiece(king);
+
+                                    if (!clone.isBlackKingInCheck(clone)) {
+                                        Board clone_two = board.cloneBoard(board);
+                                        king = (King)(clone.getTile(7, 4).getPiece());
+                                        king.setCol(2);
+                                        clone.getTile(7, 4).setOccupied(false);
+                                        clone.getTile(7, 2).setOccupied(true);
+                                        clone.getTile(7, 2).setPiece(king);
+
+                                        if (!clone_two.isBlackKingInCheck(clone_two)) {
+                                            int[] move = {7, 2};
+                                            array.add(move);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

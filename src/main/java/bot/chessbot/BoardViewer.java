@@ -31,7 +31,7 @@ public class BoardViewer extends Application {
 
         BorderPane root = new BorderPane();
 
-        board = new Board();
+        board = new Board(true);
         board.setOnMouseClicked(new tileEventHandler());
 
         root.setCenter(board);
@@ -51,6 +51,8 @@ public class BoardViewer extends Application {
 
             int row = board.rowForYPos(e.getY());
             int col = board.colForXPos(e.getX());
+
+            boolean moveDone = false;
             if (selectedTileBool && board.getTile(row, col).isOccupied()) {
                 if (selectedTile.getPiece().getColor().equals(board.getTile(row, col).getPiece().getColor())) {
                     selectedTileBool = false;
@@ -70,7 +72,7 @@ public class BoardViewer extends Application {
 
                     for (int[] move : moves) {
 
-                        boolean moveDone = false;
+                        moveDone = false;
 
                         if (move[0] == row && move[1] == col) {
 
@@ -284,7 +286,11 @@ public class BoardViewer extends Application {
                                 selectedTile.getPiece().setCol(col);
                                 selectedTile.setPiece(null);
                                 selectedTile.setOccupied(false);
+                                moveDone = true;
+
                             }
+
+
 
 
                             if (board.getTurn() % 2 == 1) {
@@ -294,6 +300,7 @@ public class BoardViewer extends Application {
                             }
 
                             board.setTurn(board.getTurn() + 1);
+
 
 
 
@@ -359,10 +366,32 @@ public class BoardViewer extends Application {
 
 
             try {
+
                 board.drawBoard();
+
+                //System.out.println("DONE WITH DRAWING");
+                if (moveDone) {
+                    //System.out.println("SEARCHING FOR LEGAL MOVES");
+                    try {
+
+                        System.out.println("GET LEGAL MOVES FUNCTION BEGINS HERE");
+                        ArrayList<int[]> array = board.getLegalMoves();
+                        if (array.isEmpty()) {
+                            System.out.println("CHECKMATE");
+                        } else {
+                            System.out.println("# of legal moves: " + array.size());
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+            System.out.println(moveDone);
+
+
 
 
 

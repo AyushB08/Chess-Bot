@@ -25,7 +25,7 @@ public class Board extends Group {
     private int turn = 1;
 
 
-    public Board() throws IOException {
+    public Board(boolean draw) throws IOException {
 
         colorOne = Color.web("#F0D9B5",1.0);
         colorTwo = Color.web("#B58863",1.0);
@@ -38,8 +38,12 @@ public class Board extends Group {
 
         board = new Tile[8][8];
 
-        initalizeBoard();
-        drawBoard();
+
+        if (draw) {
+            initalizeBoard();
+            drawBoard();
+        }
+
 
 
     }
@@ -105,7 +109,13 @@ public class Board extends Group {
 
                 this.getChildren().add(tile);
             }
+
+
         }
+
+        System.out.println("DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. ");
+
+        System.out.println("ALMOST DONE DRAWING");
     }
 
 
@@ -213,7 +223,7 @@ public class Board extends Group {
 
             }
         }
-        drawBoard();
+
     }
 
     public boolean isWhiteKingInCheck(Board clone) throws IOException {
@@ -312,7 +322,7 @@ public class Board extends Group {
     }
 
     public Board cloneBoard(Board x) throws IOException {
-        Board clone = new Board();
+        Board clone = new Board(false);
         for (int i = 0; i < 8; i++) {
             for (int a = 0; a  < 8; a++ ) {
                 clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)));
@@ -320,11 +330,45 @@ public class Board extends Group {
         }
         return clone;
     }
+
+    public ArrayList<int[]> getLegalMoves() throws IOException {
+        ArrayList<int[]> legalMoves = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++) {
+
+            for (int a = 0; a  < 8; a++ ) {
+
+                if (getTile(i, a).isOccupied()) {
+                    if ((turn % 2 == 1 && getTile(i, a).getPiece().getColor().equals("white")) || (turn % 2 ==0 && getTile(i, a).getPiece().getColor().equals("black"))) {
+
+
+                        Piece piece = getTile(i, a).getPiece();
+                        ArrayList<int[]> moves = piece.getValidMoves(this);
+
+                        for (int c = 0; c < moves.size(); c++) {
+
+                            int[] move = moves.get(c);
+                            Tile chosen = getTile(i, a);
+                            if (this.testMove(chosen, move[0], move[1])) {
+
+                                int[] array = {i, a, move[0], move[1]};
+                                legalMoves.add(array);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return legalMoves;
+    }
+
     public boolean testMove(Tile chosenTile, int row, int col) throws IOException {
 
 
         Board clone = cloneBoard(this);
-
+        System.out.println("test");
         Tile selectedTile = chosenTile.cloneTile(chosenTile);
 
         clone.setTile(selectedTile);
