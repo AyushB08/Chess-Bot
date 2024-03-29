@@ -72,6 +72,7 @@ public class BoardViewer extends Application {
 
                     for (int[] move : moves) {
 
+
                         moveDone = false;
 
                         if (move[0] == row && move[1] == col) {
@@ -369,17 +370,29 @@ public class BoardViewer extends Application {
 
                 board.drawBoard();
 
-                //System.out.println("DONE WITH DRAWING");
+
                 if (moveDone) {
-                    //System.out.println("SEARCHING FOR LEGAL MOVES");
+
                     try {
 
-                        System.out.println("GET LEGAL MOVES FUNCTION BEGINS HERE");
-                        ArrayList<int[]> array = board.getLegalMoves();
-                        if (array.isEmpty()) {
-                            System.out.println("CHECKMATE");
-                        } else {
-                            System.out.println("# of legal moves: " + array.size());
+
+                        //ArrayList<int[]> array = board.getLegalMoves();
+                        //System.out.println("LEGAL MOVES LEFT: " + array.size());
+                        if (board.isGameOver(board)) {
+                            if (board.getTurn() % 2 == 0) {
+                                if (board.isBlackKingInCheck(board)) {
+                                    System.out.println("WHITE WINS");
+                                } else {
+                                    System.out.println("STALEMATE");
+                                }
+                            } else {
+                                if (board.isWhiteKingInCheck(board)) {
+                                    System.out.println("BLACK WINS");
+                                } else {
+                                    System.out.println("STALEMATE");
+                                }
+                            }
+
                         }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -389,7 +402,7 @@ public class BoardViewer extends Application {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            System.out.println(moveDone);
+
 
 
 

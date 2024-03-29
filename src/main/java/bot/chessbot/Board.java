@@ -113,9 +113,7 @@ public class Board extends Group {
 
         }
 
-        System.out.println("DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. DRAW BOARD IS DONE. ");
 
-        System.out.println("ALMOST DONE DRAWING");
     }
 
 
@@ -262,7 +260,14 @@ public class Board extends Group {
                 if (clone.getTile(i, a).isOccupied()) {
                     Piece piece = clone.getTile(i, a).getPiece();
                     if (piece.getColor().equals("black")) {
-                        ArrayList<int[]> moves = piece.getValidMoves(clone);
+                        ArrayList<int[]> moves = new ArrayList<>();
+                        if (piece.getName().equals("King")) {
+                            King king = (King) piece;
+                            moves = king.getValidMovesWithoutCastle(clone);
+                        } else {
+                            moves = piece.getValidMoves(clone);
+                        }
+
                         for (int[] move : moves) {
                             if (move[0] == kingLocation[0] && move[1] == kingLocation[1]) {
 
@@ -307,7 +312,13 @@ public class Board extends Group {
                     Piece piece = clone.getTile(i, a).getPiece();
                     if (piece.getColor().equals("white")) {
 
-                        ArrayList<int[]> moves = piece.getValidMoves(clone);
+                        ArrayList<int[]> moves = new ArrayList<>();
+                        if (piece.getName().equals("King")) {
+                            King king = (King) piece;
+                            moves = king.getValidMovesWithoutCastle(clone);
+                        } else {
+                            moves = piece.getValidMoves(clone);
+                        }
                         for (int[] move : moves) {
                             if (move[0] == kingLocation[0] && move[1] == kingLocation[1]) {
                                 return true;
@@ -329,6 +340,39 @@ public class Board extends Group {
             }
         }
         return clone;
+    }
+
+    public boolean isGameOver(Board board) throws IOException {
+        ArrayList<int[]> legalMoves = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++) {
+
+            for (int a = 0; a  < 8; a++ ) {
+
+                if (getTile(i, a).isOccupied()) {
+                    if ((turn % 2 == 1 && getTile(i, a).getPiece().getColor().equals("white")) || (turn % 2 ==0 && getTile(i, a).getPiece().getColor().equals("black"))) {
+
+
+                        Piece piece = getTile(i, a).getPiece();
+                        ArrayList<int[]> moves = piece.getValidMoves(this);
+
+                        for (int c = 0; c < moves.size(); c++) {
+
+                            int[] move = moves.get(c);
+                            Tile chosen = getTile(i, a);
+                            if (this.testMove(chosen, move[0], move[1])) {
+
+                                return false;
+
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return true;
     }
 
     public ArrayList<int[]> getLegalMoves() throws IOException {
@@ -353,6 +397,7 @@ public class Board extends Group {
 
                                 int[] array = {i, a, move[0], move[1]};
                                 legalMoves.add(array);
+
                             }
                         }
                     }
@@ -368,7 +413,7 @@ public class Board extends Group {
 
 
         Board clone = cloneBoard(this);
-        System.out.println("test");
+
         Tile selectedTile = chosenTile.cloneTile(chosenTile);
 
         clone.setTile(selectedTile);

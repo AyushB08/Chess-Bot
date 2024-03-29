@@ -30,6 +30,18 @@ public class King extends Piece{
 
     }
 
+    public ArrayList<int[]> getValidMovesWithoutCastle(Board board) throws IOException {
+
+        ArrayList<int[]> possibleMoves = new ArrayList<>();
+        getMoves(possibleMoves, board);
+
+
+
+        return possibleMoves;
+
+
+    }
+
     @Override
     public Piece clonePiece(Piece x) {
         King king = new King(row, col, color);
