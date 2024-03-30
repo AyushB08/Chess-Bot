@@ -13,7 +13,7 @@ public class Board extends Group {
     private Tile[][] board;
     private double tileSize;
 
-    private boolean playerIsWhite;
+
     private final Color colorOne;
 
 
@@ -24,6 +24,8 @@ public class Board extends Group {
 
     private int turn = 1;
 
+    private boolean playingAsWhite = true;
+
 
     public Board(boolean draw) throws IOException {
 
@@ -33,14 +35,13 @@ public class Board extends Group {
         activatedOne = Color.web("#646F40",1.0);
         activatedTwo = Color.web("829769", 1.0);
 
-        playerIsWhite = true;
         tileSize = 80;
 
         board = new Tile[8][8];
 
 
         if (draw) {
-            initalizeBoard();
+            initializeBoard();
             drawBoard();
         }
 
@@ -73,26 +74,45 @@ public class Board extends Group {
     }
 
 
-    public double yPosForRow(int row) {
-        return row * tileSize;
-    }
 
     public int colForXPos(double x) {
-        return  ((int)(x / tileSize));
+
+        if (playingAsWhite) {
+            return  ((int)(x / tileSize));
+        } else {
+            return 7- ((int)(x / tileSize));
+        }
+
     }
 
     public int rowForYPos(double y) {
-        return 7 - ((int)(y / tileSize));
+        if (playingAsWhite) {
+            return 7 - ((int)(y / tileSize));
+        } else {
+            return ((int)(y / tileSize));
+        }
+
     }
 
-    public void setTile(Tile tile) {
-        board[7-tile.getRow()][tile.getColumn()] = tile;
+    public void setTile(Tile tile, boolean playingAsWhite) {
+        if (playingAsWhite) {
+            board[7-tile.getRow()][tile.getColumn()] = tile;
+        } else {
+            board[tile.getRow()][7-tile.getColumn()] = tile;
+        }
+
     }
+
+
 
     public Tile getTile(int row, int col) {
 
+        if (playingAsWhite) {
+            return board[7-row][col];
+        } else {
+            return board[row][7-col];
+        }
 
-        return board[7-row][col];
     }
 
 
@@ -101,8 +121,13 @@ public class Board extends Group {
         this.getChildren().clear();
         for (int i = 0; i <= 7; i++) {
             for (int a = 0; a <= 7; a++) {
+                Tile tile;
+                if (playingAsWhite) {
+                    tile = getTile(7-i, a);
+                } else {
+                    tile = getTile(i, 7-a);
+                }
 
-                Tile tile = getTile(7-i, a);
                 tile.drawTile();
                 tile.setLayoutX(tileSize * a);
                 tile.setLayoutY(tileSize * i);
@@ -117,99 +142,196 @@ public class Board extends Group {
     }
 
 
-    public void initalizeBoard() throws IOException {
+    public void initializeBoard() throws IOException {
 
-        this.getChildren().clear();
-
-        board = new Tile[8][8];
-
-        Tile black_tile_one = new Tile(7, 0, tileSize, colorOne, activatedOne, true, new Rook(7, 0, "black"));
-        Tile black_tile_two = new Tile(7, 1, tileSize, colorTwo, activatedTwo, true, new Knight(7, 1, "black"));
-        Tile black_tile_three = new Tile(7, 2, tileSize, colorOne, activatedOne, true, new Bishop(7, 2, "black"));
-        Tile black_tile_four = new Tile(7, 3, tileSize, colorTwo, activatedTwo, true, new Queen(7, 3, "black"));
-        Tile black_tile_five = new Tile(7, 4, tileSize, colorOne, activatedOne, true, new King(7, 4, "black"));
-        Tile black_tile_six = new Tile(7,5, tileSize, colorTwo, activatedTwo, true, new Bishop(7, 5, "black"));
-        Tile black_tile_seven = new Tile(7, 6, tileSize, colorOne, activatedOne, true, new Knight(7, 6, "black"));
-        Tile black_tile_eight = new Tile(7, 7, tileSize, colorTwo, activatedTwo, true, new Rook(7, 7, "black"));
-
-        Tile black_pawn_one = new Tile(6, 0, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 0, "black"));
-        Tile black_pawn_two = new Tile(6, 1, tileSize, colorOne, activatedOne, true, new Pawn(6, 1, "black"));
-        Tile black_pawn_three = new Tile(6, 2, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 2, "black"));
-        Tile black_pawn_four = new Tile(6, 3, tileSize, colorOne, activatedOne, true, new Pawn(6, 3, "black"));
-        Tile black_pawn_five = new Tile(6, 4, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 4, "black"));
-        Tile black_pawn_six = new Tile(6, 5, tileSize, colorOne , activatedOne, true, new Pawn(6, 5, "black"));
-        Tile black_pawn_seven = new Tile(6, 6, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 6, "black"));
-        Tile black_pawn_eight = new Tile(6, 7, tileSize, colorOne, activatedOne, true, new Pawn(6, 7, "black"));
-
-        setTile(black_tile_one);
-        setTile(black_tile_two);
-        setTile(black_tile_three);
-        setTile(black_tile_four);
-        setTile(black_tile_five);
-        setTile(black_tile_six);
-        setTile(black_tile_seven);
-        setTile(black_tile_eight);
-
-        setTile(black_pawn_one);
-        setTile(black_pawn_two);
-        setTile(black_pawn_three);
-        setTile(black_pawn_four);
-        setTile(black_pawn_five);
-        setTile(black_pawn_six);
-        setTile(black_pawn_seven);
-        setTile(black_pawn_eight);
+        if (playingAsWhite) {
 
 
-        for (int i = 2; i <= 5; i++) {
+            this.getChildren().clear();
 
-            for (int a = 0; a <= 7; a++) {
-                Tile tile;
-                if ((i % 2 == 0 && a % 2 != 0) || (i % 2 != 0 && a % 2 == 0)) {
-                    tile = new Tile(i, a, tileSize, colorOne, activatedOne, false, null);
-                } else {
-                    tile = new Tile(i, a, tileSize, colorTwo, activatedTwo, false, null);
+            board = new Tile[8][8];
+
+            Tile black_tile_one = new Tile(7, 0, tileSize, colorOne, activatedOne, true, new Rook(7, 0, "black"));
+            Tile black_tile_two = new Tile(7, 1, tileSize, colorTwo, activatedTwo, true, new Knight(7, 1, "black"));
+            Tile black_tile_three = new Tile(7, 2, tileSize, colorOne, activatedOne, true, new Bishop(7, 2, "black"));
+            Tile black_tile_four = new Tile(7, 3, tileSize, colorTwo, activatedTwo, true, new Queen(7, 3, "black"));
+            Tile black_tile_five = new Tile(7, 4, tileSize, colorOne, activatedOne, true, new King(7, 4, "black"));
+            Tile black_tile_six = new Tile(7, 5, tileSize, colorTwo, activatedTwo, true, new Bishop(7, 5, "black"));
+            Tile black_tile_seven = new Tile(7, 6, tileSize, colorOne, activatedOne, true, new Knight(7, 6, "black"));
+            Tile black_tile_eight = new Tile(7, 7, tileSize, colorTwo, activatedTwo, true, new Rook(7, 7, "black"));
+
+            Tile black_pawn_one = new Tile(6, 0, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 0, "black"));
+            Tile black_pawn_two = new Tile(6, 1, tileSize, colorOne, activatedOne, true, new Pawn(6, 1, "black"));
+            Tile black_pawn_three = new Tile(6, 2, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 2, "black"));
+            Tile black_pawn_four = new Tile(6, 3, tileSize, colorOne, activatedOne, true, new Pawn(6, 3, "black"));
+            Tile black_pawn_five = new Tile(6, 4, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 4, "black"));
+            Tile black_pawn_six = new Tile(6, 5, tileSize, colorOne, activatedOne, true, new Pawn(6, 5, "black"));
+            Tile black_pawn_seven = new Tile(6, 6, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 6, "black"));
+            Tile black_pawn_eight = new Tile(6, 7, tileSize, colorOne, activatedOne, true, new Pawn(6, 7, "black"));
+
+            setTile(black_tile_one, true);
+            setTile(black_tile_two, true);
+            setTile(black_tile_three, true);
+            setTile(black_tile_four, true);
+            setTile(black_tile_five, true);
+            setTile(black_tile_six, true);
+            setTile(black_tile_seven, true);
+            setTile(black_tile_eight, true);
+
+            setTile(black_pawn_one, true);
+            setTile(black_pawn_two, true);
+            setTile(black_pawn_three, true);
+            setTile(black_pawn_four, true);
+            setTile(black_pawn_five, true);
+            setTile(black_pawn_six, true);
+            setTile(black_pawn_seven, true);
+            setTile(black_pawn_eight, true);
+
+
+            for (int i = 2; i <= 5; i++) {
+
+                for (int a = 0; a <= 7; a++) {
+                    Tile tile;
+                    if ((i % 2 == 0 && a % 2 != 0) || (i % 2 != 0 && a % 2 == 0)) {
+                        tile = new Tile(i, a, tileSize, colorOne, activatedOne, false, null);
+                    } else {
+                        tile = new Tile(i, a, tileSize, colorTwo, activatedTwo, false, null);
+                    }
+
+                    setTile(tile, true);
                 }
-
-                setTile(tile);
             }
+
+            Tile white_tile_one = new Tile(0, 0, tileSize, colorTwo, activatedTwo, true, new Rook(0, 0, "white"));
+            Tile white_tile_two = new Tile(0, 1, tileSize, colorOne, activatedOne, true, new Knight(0, 1, "white"));
+            Tile white_tile_three = new Tile(0, 2, tileSize, colorTwo, activatedTwo, true, new Bishop(0, 2, "white"));
+            Tile white_tile_four = new Tile(0, 3, tileSize, colorOne, activatedOne, true, new Queen(0, 3, "white"));
+            Tile white_tile_five = new Tile(0, 4, tileSize, colorTwo, activatedTwo, true, new King(0, 4, "white"));
+            Tile white_tile_six = new Tile(0, 5, tileSize, colorOne, activatedOne, true, new Bishop(0, 5, "white"));
+            Tile white_tile_seven = new Tile(0, 6, tileSize, colorTwo, activatedTwo, true, new Knight(0, 6, "white"));
+            Tile white_tile_eight = new Tile(0, 7, tileSize, colorOne, activatedOne, true, new Rook(0, 7, "white"));
+
+            Tile white_pawn_one = new Tile(1, 0, tileSize, colorOne, activatedOne, true, new Pawn(1, 0, "white"));
+            Tile white_pawn_two = new Tile(1, 1, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 1, "white"));
+            Tile white_pawn_three = new Tile(1, 2, tileSize, colorOne, activatedOne, true, new Pawn(1, 2, "white"));
+            Tile white_pawn_four = new Tile(1, 3, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 3, "white"));
+            Tile white_pawn_five = new Tile(1, 4, tileSize, colorOne, activatedOne, true, new Pawn(1, 4, "white"));
+            Tile white_pawn_six = new Tile(1, 5, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 5, "white"));
+            Tile white_pawn_seven = new Tile(1, 6, tileSize, colorOne, activatedOne, true, new Pawn(1, 6, "white"));
+            Tile white_pawn_eight = new Tile(1, 7, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 7, "white"));
+
+
+            setTile(white_tile_one, true);
+            setTile(white_tile_two, true);
+            setTile(white_tile_three, true);
+            setTile(white_tile_four, true);
+            setTile(white_tile_five, true);
+            setTile(white_tile_six, true);
+            setTile(white_tile_seven, true);
+            setTile(white_tile_eight, true);
+
+            setTile(white_pawn_one, true);
+            setTile(white_pawn_two, true);
+            setTile(white_pawn_three, true);
+            setTile(white_pawn_four, true);
+            setTile(white_pawn_five, true);
+            setTile(white_pawn_six, true);
+            setTile(white_pawn_seven, true);
+            setTile(white_pawn_eight, true);
+
+        } else {
+            this.getChildren().clear();
+
+            board = new Tile[8][8];
+
+            Tile black_tile_one = new Tile(7, 0, tileSize, colorOne, activatedOne, true, new Rook(7, 0, "black"));
+            Tile black_tile_two = new Tile(7, 1, tileSize, colorTwo, activatedTwo, true, new Knight(7, 1, "black"));
+            Tile black_tile_three = new Tile(7, 2, tileSize, colorOne, activatedOne, true, new Bishop(7, 2, "black"));
+            Tile black_tile_four = new Tile(7, 3, tileSize, colorTwo, activatedTwo, true, new Queen(7, 3, "black"));
+            Tile black_tile_five = new Tile(7, 4, tileSize, colorOne, activatedOne, true, new King(7, 4, "black"));
+            Tile black_tile_six = new Tile(7, 5, tileSize, colorTwo, activatedTwo, true, new Bishop(7, 5, "black"));
+            Tile black_tile_seven = new Tile(7, 6, tileSize, colorOne, activatedOne, true, new Knight(7, 6, "black"));
+            Tile black_tile_eight = new Tile(7, 7, tileSize, colorTwo, activatedTwo, true, new Rook(7, 7, "black"));
+
+            Tile black_pawn_one = new Tile(6, 0, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 0, "black"));
+            Tile black_pawn_two = new Tile(6, 1, tileSize, colorOne, activatedOne, true, new Pawn(6, 1, "black"));
+            Tile black_pawn_three = new Tile(6, 2, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 2, "black"));
+            Tile black_pawn_four = new Tile(6, 3, tileSize, colorOne, activatedOne, true, new Pawn(6, 3, "black"));
+            Tile black_pawn_five = new Tile(6, 4, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 4, "black"));
+            Tile black_pawn_six = new Tile(6, 5, tileSize, colorOne, activatedOne, true, new Pawn(6, 5, "black"));
+            Tile black_pawn_seven = new Tile(6, 6, tileSize, colorTwo, activatedTwo, true, new Pawn(6, 6, "black"));
+            Tile black_pawn_eight = new Tile(6, 7, tileSize, colorOne, activatedOne, true, new Pawn(6, 7, "black"));
+
+            setTile(black_tile_one, false);
+            setTile(black_tile_two, false);
+            setTile(black_tile_three, false);
+            setTile(black_tile_four, false);
+            setTile(black_tile_five, false);
+            setTile(black_tile_six, false);
+            setTile(black_tile_seven, false);
+            setTile(black_tile_eight, false);
+
+            setTile(black_pawn_one, false);
+            setTile(black_pawn_two, false);
+            setTile(black_pawn_three, false);
+            setTile(black_pawn_four, false);
+            setTile(black_pawn_five, false);
+            setTile(black_pawn_six, false);
+            setTile(black_pawn_seven, false);
+            setTile(black_pawn_eight, false);
+
+
+            for (int i = 2; i <= 5; i++) {
+
+                for (int a = 0; a <= 7; a++) {
+                    Tile tile;
+                    if ((i % 2 == 0 && a % 2 != 0) || (i % 2 != 0 && a % 2 == 0)) {
+                        tile = new Tile(i, a, tileSize, colorOne, activatedOne, false, null);
+                    } else {
+                        tile = new Tile(i, a, tileSize, colorTwo, activatedTwo, false, null);
+                    }
+
+                    setTile(tile, false);
+                }
+            }
+
+            Tile white_tile_one = new Tile(0, 0, tileSize, colorTwo, activatedTwo, true, new Rook(0, 0, "white"));
+            Tile white_tile_two = new Tile(0, 1, tileSize, colorOne, activatedOne, true, new Knight(0, 1, "white"));
+            Tile white_tile_three = new Tile(0, 2, tileSize, colorTwo, activatedTwo, true, new Bishop(0, 2, "white"));
+            Tile white_tile_four = new Tile(0, 3, tileSize, colorOne, activatedOne, true, new Queen(0, 3, "white"));
+            Tile white_tile_five = new Tile(0, 4, tileSize, colorTwo, activatedTwo, true, new King(0, 4, "white"));
+            Tile white_tile_six = new Tile(0, 5, tileSize, colorOne, activatedOne, true, new Bishop(0, 5, "white"));
+            Tile white_tile_seven = new Tile(0, 6, tileSize, colorTwo, activatedTwo, true, new Knight(0, 6, "white"));
+            Tile white_tile_eight = new Tile(0, 7, tileSize, colorOne, activatedOne, true, new Rook(0, 7, "white"));
+
+            Tile white_pawn_one = new Tile(1, 0, tileSize, colorOne, activatedOne, true, new Pawn(1, 0, "white"));
+            Tile white_pawn_two = new Tile(1, 1, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 1, "white"));
+            Tile white_pawn_three = new Tile(1, 2, tileSize, colorOne, activatedOne, true, new Pawn(1, 2, "white"));
+            Tile white_pawn_four = new Tile(1, 3, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 3, "white"));
+            Tile white_pawn_five = new Tile(1, 4, tileSize, colorOne, activatedOne, true, new Pawn(1, 4, "white"));
+            Tile white_pawn_six = new Tile(1, 5, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 5, "white"));
+            Tile white_pawn_seven = new Tile(1, 6, tileSize, colorOne, activatedOne, true, new Pawn(1, 6, "white"));
+            Tile white_pawn_eight = new Tile(1, 7, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 7, "white"));
+
+
+            setTile(white_tile_one, false);
+            setTile(white_tile_two, false);
+            setTile(white_tile_three, false);
+            setTile(white_tile_four, false);
+            setTile(white_tile_five, false);
+            setTile(white_tile_six, false);
+            setTile(white_tile_seven, false);
+            setTile(white_tile_eight, false);
+
+            setTile(white_pawn_one, false);
+            setTile(white_pawn_two, false);
+            setTile(white_pawn_three, false);
+            setTile(white_pawn_four, false);
+            setTile(white_pawn_five, false);
+            setTile(white_pawn_six, false);
+            setTile(white_pawn_seven, false);
+            setTile(white_pawn_eight, false);
         }
-
-        Tile white_tile_one = new Tile(0, 0, tileSize, colorTwo, activatedTwo ,true, new Rook(0, 0, "white"));
-        Tile white_tile_two = new Tile(0, 1, tileSize, colorOne, activatedOne, true, new Knight(0, 1, "white"));
-        Tile white_tile_three = new Tile(0, 2, tileSize, colorTwo, activatedTwo, true, new Bishop(0, 2, "white"));
-        Tile white_tile_four = new Tile(0, 3, tileSize, colorOne, activatedOne, true, new Queen(0, 3, "white"));
-        Tile white_tile_five = new Tile(0, 4, tileSize, colorTwo, activatedTwo, true, new King(0, 4 ,"white"));
-        Tile white_tile_six = new Tile(0,5, tileSize, colorOne, activatedOne, true, new Bishop(0, 5, "white"));
-        Tile white_tile_seven = new Tile(0, 6, tileSize, colorTwo, activatedTwo, true, new Knight(0, 6, "white"));
-        Tile white_tile_eight = new Tile(0, 7, tileSize, colorOne, activatedOne, true, new Rook(0, 7, "white"));
-
-        Tile white_pawn_one = new Tile(1, 0, tileSize, colorOne, activatedOne, true, new Pawn(1, 0, "white"));
-        Tile white_pawn_two = new Tile(1, 1, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 1, "white"));
-        Tile white_pawn_three = new Tile(1, 2, tileSize, colorOne, activatedOne, true, new Pawn(1, 2, "white"));
-        Tile white_pawn_four = new Tile(1, 3, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 3, "white"));
-        Tile white_pawn_five = new Tile(1, 4, tileSize, colorOne, activatedOne, true, new Pawn(1, 4, "white"));
-        Tile white_pawn_six = new Tile(1, 5, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 5, "white"));
-        Tile white_pawn_seven = new Tile(1, 6, tileSize, colorOne, activatedOne, true, new Pawn(1, 6, "white"));
-        Tile white_pawn_eight = new Tile(1, 7, tileSize, colorTwo, activatedTwo, true, new Pawn(1, 7 , "white"));
-
-
-        setTile(white_tile_one);
-        setTile(white_tile_two);
-        setTile(white_tile_three);
-        setTile(white_tile_four);
-        setTile(white_tile_five);
-        setTile(white_tile_six);
-        setTile(white_tile_seven);
-        setTile(white_tile_eight);
-
-        setTile(white_pawn_one);
-        setTile(white_pawn_two);
-        setTile(white_pawn_three);
-        setTile(white_pawn_four);
-        setTile(white_pawn_five);
-        setTile(white_pawn_six);
-        setTile(white_pawn_seven);
-        setTile(white_pawn_eight);
 
     }
 
@@ -336,7 +458,7 @@ public class Board extends Group {
         Board clone = new Board(false);
         for (int i = 0; i < 8; i++) {
             for (int a = 0; a  < 8; a++ ) {
-                clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)));
+                clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)), playingAsWhite);
             }
         }
         return clone;
@@ -416,7 +538,7 @@ public class Board extends Group {
 
         Tile selectedTile = chosenTile.cloneTile(chosenTile);
 
-        clone.setTile(selectedTile);
+        clone.setTile(selectedTile, playingAsWhite);
 
         boolean moveDone = false;
 

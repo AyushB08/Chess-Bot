@@ -49,8 +49,19 @@ public class BoardViewer extends Application {
         @Override
         public void handle(MouseEvent e) {
 
+            ArrayList<int[]> array = null;
+            try {
+                array = board.getLegalMoves();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+
             int row = board.rowForYPos(e.getY());
             int col = board.colForXPos(e.getX());
+
+
+
 
             boolean moveDone = false;
             if (selectedTileBool && board.getTile(row, col).isOccupied()) {
@@ -375,19 +386,24 @@ public class BoardViewer extends Application {
 
                     try {
 
-
-                        //ArrayList<int[]> array = board.getLegalMoves();
-                        //System.out.println("LEGAL MOVES LEFT: " + array.size());
+                        String color = "";
+                        if (board.getTurn() % 2 == 0) {
+                            color = "BLACK";
+                        } else {
+                            color = "WHITE";
+                        }
+                        array = board.getLegalMoves();
+                        System.out.println(color + " LEGAL MOVES LEFT: " + array.size());
                         if (board.isGameOver(board)) {
                             if (board.getTurn() % 2 == 0) {
                                 if (board.isBlackKingInCheck(board)) {
-                                    System.out.println("WHITE WINS");
+                                    System.out.println("CHECKMATE, WHITE WINS");
                                 } else {
                                     System.out.println("STALEMATE");
                                 }
                             } else {
                                 if (board.isWhiteKingInCheck(board)) {
-                                    System.out.println("BLACK WINS");
+                                    System.out.println("CHECKMATE, BLACK WINS");
                                 } else {
                                     System.out.println("STALEMATE");
                                 }
