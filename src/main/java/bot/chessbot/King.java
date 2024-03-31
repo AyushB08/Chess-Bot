@@ -201,7 +201,7 @@ public class King extends Piece{
 
                                     if (!clone.isBlackKingInCheck(clone)) {
                                         Board clone_two = board.cloneBoard(board);
-                                        king = (King)(clone.getTile(0, 4).getPiece());
+                                        king = (King)(clone.getTile(7, 4).getPiece());
                                         king.setCol(6);
                                         clone.getTile(7, 4).setOccupied(false);
                                         clone.getTile(7, 6).setOccupied(true);

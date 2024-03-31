@@ -1,5 +1,6 @@
 package bot.chessbot;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -7,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.util.Arrays;
 public class BoardViewer extends Application {
 
     static Board board;
+    public Engine engine = new Engine();
     boolean selectedTileBool = false;
     Tile selectedTile;
 
@@ -34,6 +37,8 @@ public class BoardViewer extends Application {
         board = new Board(true);
         board.setOnMouseClicked(new tileEventHandler());
 
+
+
         root.setCenter(board);
 
         Scene scene = new Scene(root, 640, 640);
@@ -42,6 +47,22 @@ public class BoardViewer extends Application {
         stage.setScene(scene);
         stage.show();
 
+
+        if (!board.getPlayingAsWhite()) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(1));
+            delay.setOnFinished(event -> {
+                try {
+                    engine.playRandomMove(board);
+                    board.drawBoard();
+                    board.setTurn(board.getTurn() + 1);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            delay.play();
+        }
+
+
     }
 
     private class tileEventHandler implements EventHandler<MouseEvent> {
@@ -49,59 +70,91 @@ public class BoardViewer extends Application {
         @Override
         public void handle(MouseEvent e) {
 
-            ArrayList<int[]> array = null;
-            try {
-                array = board.getLegalMoves();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            if ((board.getPlayingAsWhite() && board.getTurn() % 2 == 1) || (!board.getPlayingAsWhite() && board.getTurn() % 2 == 0)) {
 
 
-            int row = board.rowForYPos(e.getY());
-            int col = board.colForXPos(e.getX());
-
-
-
-
-            boolean moveDone = false;
-            if (selectedTileBool && board.getTile(row, col).isOccupied()) {
-                if (selectedTile.getPiece().getColor().equals(board.getTile(row, col).getPiece().getColor())) {
-                    selectedTileBool = false;
+                ArrayList<int[]> array = null;
+                try {
+                    array = board.getLegalMoves();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
-            }
 
-            try {
-                if (selectedTileBool && (selectedTile.getColumn() != col || selectedTile.getRow() != row) && board.testMove(selectedTile, row, col)) {
 
-                    ArrayList<int[]> moves = null;
-                    try {
-                        moves = selectedTile.getPiece().getValidMoves(board);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                int row = board.rowForYPos(e.getY());
+                int col = board.colForXPos(e.getX());
+
+
+                boolean moveDone = false;
+                if (selectedTileBool && board.getTile(row, col).isOccupied()) {
+                    if (selectedTile.getPiece().getColor().equals(board.getTile(row, col).getPiece().getColor())) {
+                        selectedTileBool = false;
                     }
+                }
+
+                try {
+                    if (selectedTileBool && (selectedTile.getColumn() != col || selectedTile.getRow() != row) && board.testMove(selectedTile, row, col)) {
+
+                        ArrayList<int[]> moves = null;
+                        try {
+                            moves = selectedTile.getPiece().getValidMoves(board);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
 
 
-                    for (int[] move : moves) {
+                        for (int[] move : moves) {
 
 
-                        moveDone = false;
+                            moveDone = false;
 
-                        if (move[0] == row && move[1] == col) {
+                            if (move[0] == row && move[1] == col) {
 
-                            if (selectedTile.getPiece().getName().equals("Pawn")) {
-                                if (Math.abs(row - selectedTile.getRow()) == 2) {
-                                    Pawn pawn = (Pawn) selectedTile.getPiece();
-                                    pawn.set_en_passant(true);
-                                } else if (Math.abs(row - selectedTile.getRow()) == 1 && Math.abs(col - selectedTile.getColumn()) == 1) {
-                                    if (!board.getTile(row, col).isOccupied()) {
+                                if (selectedTile.getPiece().getName().equals("Pawn")) {
+                                    if (Math.abs(row - selectedTile.getRow()) == 2) {
                                         Pawn pawn = (Pawn) selectedTile.getPiece();
-                                        Tile tile = board.getTile(selectedTile.getRow(), col);
+                                        pawn.set_en_passant(true);
+                                    } else if (Math.abs(row - selectedTile.getRow()) == 1 && Math.abs(col - selectedTile.getColumn()) == 1) {
+                                        if (!board.getTile(row, col).isOccupied()) {
+                                            Pawn pawn = (Pawn) selectedTile.getPiece();
+                                            Tile tile = board.getTile(selectedTile.getRow(), col);
 
-                                        tile.setOccupied(false);
-                                        selectedTile.setOccupied(false);
-                                        pawn.setRow(row);
-                                        pawn.setCol(col);
+                                            tile.setOccupied(false);
+                                            selectedTile.setOccupied(false);
+                                            pawn.setRow(row);
+                                            pawn.setCol(col);
 
+                                        }
+
+                                        if (row == 7) {
+
+
+                                            Tile tile = board.getTile(row, col);
+
+                                            tile.setOccupied(true);
+                                            selectedTile.setOccupied(false);
+
+                                            Queen queen = new Queen(7, col, "white");
+                                            tile.setPiece(queen);
+
+                                            moveDone = true;
+
+
+                                        } else if (row == 0) {
+
+
+                                            Tile tile = board.getTile(row, col);
+
+                                            tile.setOccupied(true);
+                                            selectedTile.setOccupied(false);
+
+                                            Queen queen = new Queen(0, col, "black");
+                                            tile.setPiece(queen);
+
+                                            moveDone = true;
+
+
+                                        }
                                     }
 
                                     if (row == 7) {
@@ -118,8 +171,7 @@ public class BoardViewer extends Application {
                                         moveDone = true;
 
 
-                                    }
-                                    else if (row == 0) {
+                                    } else if (row == 0) {
 
 
                                         Tile tile = board.getTile(row, col);
@@ -134,293 +186,271 @@ public class BoardViewer extends Application {
 
 
                                     }
-                                }
-
-                                if (row == 7) {
-
-
-                                    Tile tile = board.getTile(row, col);
-
-                                    tile.setOccupied(true);
-                                    selectedTile.setOccupied(false);
-
-                                    Queen queen = new Queen(7, col, "white");
-                                    tile.setPiece(queen);
-
-                                    moveDone = true;
 
 
                                 }
-                                else if (row == 0) {
+                                if (selectedTile.getPiece().getName().equals("Rook")) {
 
-
-                                    Tile tile = board.getTile(row, col);
-
-                                    tile.setOccupied(true);
-                                    selectedTile.setOccupied(false);
-
-                                    Queen queen = new Queen(0, col, "black");
-                                    tile.setPiece(queen);
-
-                                    moveDone = true;
-
-
+                                    Rook rook = (Rook) selectedTile.getPiece();
+                                    rook.setCastle(false);
                                 }
+                                if (selectedTile.getPiece().getName().equals("King")) {
+
+                                    King king = (King) selectedTile.getPiece();
+
+                                    if (king.canCastle) {
+
+                                        if (king.getColor().equals("white")) {
+                                            if (row == 0 && col == 6) {
+                                                Tile tile = board.getTile(0, 7);
+                                                Rook rook = (Rook) board.getTile(0, 7).getPiece();
+
+                                                tile.setOccupied(false);
+
+                                                selectedTile.setOccupied(false);
 
 
+                                                board.getTile(0, 5).setOccupied(true);
+                                                board.getTile(0, 5).setPiece(rook);
+                                                board.getTile(0, 6).setOccupied(true);
+                                                board.getTile(0, 6).setPiece(king);
 
-                            }
-                            if (selectedTile.getPiece().getName().equals("Rook")) {
+                                                king.setRow(0);
+                                                king.setCol(6);
+                                                rook.setRow(0);
+                                                rook.setCol(5);
 
-                                Rook rook = (Rook) selectedTile.getPiece();
-                                rook.setCastle(false);
-                            }
-                            if (selectedTile.getPiece().getName().equals("King")) {
-
-                                King king = (King) selectedTile.getPiece();
-
-                                if (king.canCastle) {
-
-                                    if (king.getColor().equals("white")) {
-                                        if (row == 0 && col == 6) {
-                                            Tile tile = board.getTile(0, 7);
-                                            Rook rook = (Rook) board.getTile(0, 7).getPiece();
-
-                                            tile.setOccupied(false);
-
-                                            selectedTile.setOccupied(false);
+                                                selectedTileBool = false;
+                                                moveDone = true;
 
 
-                                            board.getTile(0, 5).setOccupied(true);
-                                            board.getTile(0, 5).setPiece(rook);
-                                            board.getTile(0, 6).setOccupied(true);
-                                            board.getTile(0, 6).setPiece(king);
-
-                                            king.setRow(0);
-                                            king.setCol(6);
-                                            rook.setRow(0);
-                                            rook.setCol(5);
-
-                                            selectedTileBool = false;
-                                            moveDone = true;
+                                            } else if (row == 0 && col == 2) {
+                                                Tile tile = board.getTile(0, 0);
+                                                Rook rook = (Rook) board.getTile(0, 0).getPiece();
 
 
-                                        } else if (row == 0 && col == 2) {
-                                            Tile tile = board.getTile(0, 0);
-                                            Rook rook = (Rook) board.getTile(0, 0).getPiece();
+                                                tile.setOccupied(false);
+                                                selectedTile.setOccupied(false);
 
 
-                                            tile.setOccupied(false);
-                                            selectedTile.setOccupied(false);
+                                                board.getTile(0, 2).setOccupied(true);
+                                                board.getTile(0, 2).setPiece(king);
+                                                board.getTile(0, 3).setOccupied(true);
+                                                board.getTile(0, 3).setPiece(rook);
+
+                                                king.setRow(0);
+                                                king.setCol(2);
+                                                rook.setRow(0);
+                                                rook.setCol(3);
+
+                                                selectedTileBool = false;
+                                                moveDone = true;
 
 
-                                            board.getTile(0, 2).setOccupied(true);
-                                            board.getTile(0, 2).setPiece(king);
-                                            board.getTile(0, 3).setOccupied(true);
-                                            board.getTile(0, 3).setPiece(rook);
+                                            }
+                                        } else {
+                                            if (row == 7 && col == 6) {
+                                                Tile tile = board.getTile(7, 7);
+                                                Rook rook = (Rook) board.getTile(7, 7).getPiece();
 
-                                            king.setRow(0);
-                                            king.setCol(2);
-                                            rook.setRow(0);
-                                            rook.setCol(3);
-
-                                            selectedTileBool = false;
-                                            moveDone = true;
+                                                tile.setOccupied(false);
+                                                selectedTile.setOccupied(false);
 
 
+                                                board.getTile(7, 5).setOccupied(true);
+                                                board.getTile(7, 5).setPiece(rook);
+                                                board.getTile(7, 6).setOccupied(true);
+                                                board.getTile(7, 6).setPiece(king);
+
+                                                king.setRow(7);
+                                                king.setCol(6);
+                                                rook.setRow(7);
+                                                rook.setCol(5);
+
+                                                moveDone = true;
+                                                selectedTileBool = false;
+
+
+                                            } else if (row == 7 && col == 2) {
+                                                Tile tile = board.getTile(7, 0);
+                                                Rook rook = (Rook) board.getTile(7, 0).getPiece();
+
+                                                tile.setOccupied(false);
+                                                selectedTile.setOccupied(false);
+
+                                                board.getTile(7, 2).setOccupied(true);
+                                                board.getTile(7, 2).setPiece(king);
+
+                                                board.getTile(7, 3).setOccupied(true);
+                                                board.getTile(7, 3).setPiece(rook);
+
+                                                king.setRow(7);
+                                                king.setCol(2);
+                                                rook.setRow(7);
+                                                rook.setCol(3);
+
+                                                selectedTileBool = false;
+                                                moveDone = true;
+
+
+                                            }
                                         }
-                                    } else {
-                                        if (row == 7 && col == 6) {
-                                            Tile tile = board.getTile(7, 7);
-                                            Rook rook = (Rook) board.getTile(7, 7).getPiece();
-
-                                            tile.setOccupied(false);
-                                            selectedTile.setOccupied(false);
 
 
-                                            board.getTile(7, 5).setOccupied(true);
-                                            board.getTile(7, 5).setPiece(rook);
-                                            board.getTile(7, 6).setOccupied(true);
-                                            board.getTile(7, 6).setPiece(king);
-
-                                            king.setRow(7);
-                                            king.setCol(6);
-                                            rook.setRow(7);
-                                            rook.setCol(5);
-
-                                            moveDone = true;
-                                            selectedTileBool = false;
-
-
-                                        } else if (row == 7 && col == 2) {
-                                            Tile tile = board.getTile(7, 0);
-                                            Rook rook = (Rook) board.getTile(7, 0).getPiece();
-
-                                            tile.setOccupied(false);
-                                            selectedTile.setOccupied(false);
-
-                                            board.getTile(7, 2).setOccupied(true);
-                                            board.getTile(7, 2).setPiece(king);
-
-                                            board.getTile(7, 3).setOccupied(true);
-                                            board.getTile(7, 3).setPiece(rook);
-
-                                            king.setRow(7);
-                                            king.setCol(2);
-                                            rook.setRow(7);
-                                            rook.setCol(3);
-
-                                            selectedTileBool = false;
-                                            moveDone = true;
-
-
-                                        }
                                     }
 
-
+                                    king.setCastle(false);
 
 
                                 }
 
-                                king.setCastle(false);
+
+                                if (!moveDone) {
+
+                                    selectedTileBool = false;
+                                    board.getTile(row, col).setPiece(selectedTile.getPiece());
+                                    board.getTile(row, col).setOccupied(true);
+                                    selectedTile.getPiece().setRow(row);
+                                    selectedTile.getPiece().setCol(col);
+                                    selectedTile.setPiece(null);
+                                    selectedTile.setOccupied(false);
+                                    moveDone = true;
+
+                                }
 
 
+                                if (board.getTurn() % 2 == 1) {
+                                    board.removeBlackPawnEnPassant();
+                                } else {
+                                    board.removeWhitePawnEnPassant();
+                                }
+
+                                board.setTurn(board.getTurn() + 1);
+
+
+                                break;
                             }
 
 
+                        }
 
-                            if (!moveDone) {
+                        selectedTileBool = false;
 
+
+                        try {
+                            board.removeActiveTiles();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    } else {
+                        Tile tile = board.getTile(row, col);
+
+                        if (tile.getIsActive()) {
+
+                            try {
+                                board.removeActiveTiles();
                                 selectedTileBool = false;
-                                board.getTile(row, col).setPiece(selectedTile.getPiece());
-                                board.getTile(row, col).setOccupied(true);
-                                selectedTile.getPiece().setRow(row);
-                                selectedTile.getPiece().setCol(col);
-                                selectedTile.setPiece(null);
-                                selectedTile.setOccupied(false);
-                                moveDone = true;
-
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
                             }
 
-
-
-
+                        } else {
+                            try {
+                                board.removeActiveTiles();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                             if (board.getTurn() % 2 == 1) {
-                                board.removeBlackPawnEnPassant();
+                                if (tile.isOccupied()) {
+                                    if (tile.getPiece().getColor().equals("white")) {
+                                        tile.onClicked();
+                                        selectedTile = board.getTile(row, col);
+                                        selectedTileBool = true;
+                                    }
+
+                                }
                             } else {
-                                board.removeWhitePawnEnPassant();
-                            }
+                                if (tile.isOccupied()) {
+                                    if (tile.getPiece().getColor().equals("black")) {
+                                        tile.onClicked();
+                                        selectedTile = board.getTile(row, col);
+                                        selectedTileBool = true;
+                                    }
 
-                            board.setTurn(board.getTurn() + 1);
-
-
-
-
-
-                            break;
-                        }
-
-
-                    }
-
-                    selectedTileBool = false;
-
-
-                    try {
-                        board.removeActiveTiles();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                } else {
-                    Tile tile = board.getTile(row, col);
-
-                    if (tile.getIsActive()) {
-
-                        try {
-                            board.removeActiveTiles();
-                            selectedTileBool = false;
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-
-                    } else{
-                        try {
-                            board.removeActiveTiles();
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        if (board.getTurn() % 2 == 1) {
-                            if (tile.isOccupied()) {
-                                if (tile.getPiece().getColor().equals("white")) {
-                                    tile.onClicked();
-                                    selectedTile = board.getTile(row, col);
-                                    selectedTileBool = true;
                                 }
-
                             }
-                        } else {
-                            if (tile.isOccupied()) {
-                                if (tile.getPiece().getColor().equals("black")) {
-                                    tile.onClicked();
-                                    selectedTile = board.getTile(row, col);
-                                    selectedTileBool = true;
-                                }
 
-                            }
+
                         }
-
-
                     }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
 
 
-            try {
+                try {
 
-                board.drawBoard();
+                    board.drawBoard();
 
 
-                if (moveDone) {
 
-                    try {
 
-                        String color = "";
-                        if (board.getTurn() % 2 == 0) {
-                            color = "BLACK";
-                        } else {
-                            color = "WHITE";
-                        }
-                        array = board.getLegalMoves();
-                        System.out.println(color + " LEGAL MOVES LEFT: " + array.size());
-                        if (board.isGameOver(board)) {
+                    if (moveDone) {
+
+                        try {
+
+                            String color = "";
                             if (board.getTurn() % 2 == 0) {
-                                if (board.isBlackKingInCheck(board)) {
-                                    System.out.println("CHECKMATE, WHITE WINS");
-                                } else {
-                                    System.out.println("STALEMATE");
-                                }
+                                color = "BLACK";
                             } else {
-                                if (board.isWhiteKingInCheck(board)) {
-                                    System.out.println("CHECKMATE, BLACK WINS");
-                                } else {
-                                    System.out.println("STALEMATE");
-                                }
+                                color = "WHITE";
                             }
 
+                            array = board.getLegalMoves();
+                            System.out.println(color + " LEGAL MOVES LEFT: " + array.size());
+                            if (board.isGameOver(board)) {
+                                if (board.getTurn() % 2 == 0) {
+                                    if (board.isBlackKingInCheck(board)) {
+                                        System.out.println("CHECKMATE, WHITE WINS");
+                                    } else {
+                                        System.out.println("STALEMATE");
+                                    }
+                                } else {
+                                    if (board.isWhiteKingInCheck(board)) {
+                                        System.out.println("CHECKMATE, BLACK WINS");
+                                    } else {
+                                        System.out.println("STALEMATE");
+                                    }
+                                }
+
+                            }
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
                         }
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+
+                        if (!board.isGameOver(board)) {
+                            PauseTransition delay = new PauseTransition(Duration.seconds(1));
+                            delay.setOnFinished(event -> {
+                                try {
+                                    engine.playRandomMove(board);
+                                    board.drawBoard();
+                                    board.setTurn(board.getTurn() + 1);
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            });
+                            delay.play();
+                        }
+
                     }
+
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
 
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+
+
             }
-
-
-
 
 
 

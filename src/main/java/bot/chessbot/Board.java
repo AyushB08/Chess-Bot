@@ -7,6 +7,7 @@ import javafx.scene.shape.Rectangle;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Board extends Group {
@@ -24,7 +25,7 @@ public class Board extends Group {
 
     private int turn = 1;
 
-    private boolean playingAsWhite = true;
+    private boolean playingAsWhite = false;
 
 
     public Board(boolean draw) throws IOException {
@@ -49,10 +50,14 @@ public class Board extends Group {
 
     }
 
+
     public Tile[][] getBoard() {
         return board;
     }
 
+    public boolean getPlayingAsWhite() {
+        return playingAsWhite;
+    }
     public double getTileSize() {
         return tileSize;
     }
@@ -61,9 +66,6 @@ public class Board extends Group {
         tileSize = size;
     }
 
-    public double xPosForCol(int col) {
-        return col * tileSize;
-    }
 
     public int getTurn() {
         return turn;
@@ -114,7 +116,6 @@ public class Board extends Group {
         }
 
     }
-
 
 
     public void drawBoard() throws IOException {
@@ -754,14 +755,6 @@ public class Board extends Group {
 
 
         }
-
-
-        if (clone.getTurn() % 2 == 1) {
-            clone.removeBlackPawnEnPassant();
-        } else {
-            clone.removeWhitePawnEnPassant();
-        }
-
 
 
         if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
