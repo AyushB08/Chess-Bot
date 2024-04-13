@@ -30,6 +30,11 @@ public class King extends Piece{
 
     }
 
+    @Override
+    public int getValue() {
+        return 1000;
+    }
+
     public ArrayList<int[]> getValidMovesWithoutCastle(Board board) throws IOException {
 
         ArrayList<int[]> possibleMoves = new ArrayList<>();

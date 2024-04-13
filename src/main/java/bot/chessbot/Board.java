@@ -25,7 +25,7 @@ public class Board extends Group {
 
     private int turn = 1;
 
-    private boolean playingAsWhite = false;
+    private boolean playingAsWhite = true;
 
 
     public Board(boolean draw) throws IOException {
@@ -36,7 +36,7 @@ public class Board extends Group {
         activatedOne = Color.web("#646F40",1.0);
         activatedTwo = Color.web("829769", 1.0);
 
-        tileSize = 80;
+        tileSize = 50;
 
         board = new Tile[8][8];
 
@@ -457,6 +457,8 @@ public class Board extends Group {
 
     public Board cloneBoard(Board x) throws IOException {
         Board clone = new Board(false);
+        clone.setTurn(x.getTurn());
+        clone.playingAsWhite  = x.getPlayingAsWhite();
         for (int i = 0; i < 8; i++) {
             for (int a = 0; a  < 8; a++ ) {
                 clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)), playingAsWhite);
@@ -465,8 +467,40 @@ public class Board extends Group {
         return clone;
     }
 
+    public boolean isStalemate() throws IOException {
+        if (turn % 2 == 1) {
+            if (!isWhiteKingInCheck(this) && isGameOver(this)) {
+                return true;
+            }
+        } else {
+            if (!isBlackKingInCheck(this) && isGameOver(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean didWhiteWin() throws IOException {
+        if (turn % 2 == 0) {
+            if (isBlackKingInCheck(this) && isGameOver(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean didBlackWin() throws IOException {
+        if (turn % 2 == 1) {
+            if (isWhiteKingInCheck(this) && isGameOver(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isGameOver(Board board) throws IOException {
-        ArrayList<int[]> legalMoves = new ArrayList<>();
+
 
         for (int i = 0; i < 8; i++) {
 
@@ -483,6 +517,7 @@ public class Board extends Group {
 
                             int[] move = moves.get(c);
                             Tile chosen = getTile(i, a);
+                            //System.out.println("Went in is game over");
                             if (this.testMove(chosen, move[0], move[1])) {
 
                                 return false;
@@ -498,25 +533,26 @@ public class Board extends Group {
         return true;
     }
 
-    public ArrayList<int[]> getLegalMoves() throws IOException {
+    public ArrayList<int[]> getLegalMoves(Board board) throws IOException {
         ArrayList<int[]> legalMoves = new ArrayList<>();
 
         for (int i = 0; i < 8; i++) {
 
             for (int a = 0; a  < 8; a++ ) {
 
-                if (getTile(i, a).isOccupied()) {
-                    if ((turn % 2 == 1 && getTile(i, a).getPiece().getColor().equals("white")) || (turn % 2 ==0 && getTile(i, a).getPiece().getColor().equals("black"))) {
+                if (board.getTile(i, a).isOccupied()) {
+
+                    if ((turn % 2 == 1 && board.getTile(i, a).getPiece().getColor().equals("white")) || (turn % 2 ==0 && board.getTile(i, a).getPiece().getColor().equals("black"))) {
 
 
-                        Piece piece = getTile(i, a).getPiece();
+                        Piece piece = board.getTile(i, a).getPiece();
                         ArrayList<int[]> moves = piece.getValidMoves(this);
 
-                        for (int c = 0; c < moves.size(); c++) {
+                        for (int[] move : moves) {
 
-                            int[] move = moves.get(c);
-                            Tile chosen = getTile(i, a);
-                            if (this.testMove(chosen, move[0], move[1])) {
+                            Tile chosen = board.getTile(i, a);
+                            //System.out.println("went in getLegalMoves");
+                            if (board.testMove(chosen, move[0], move[1])) {
 
                                 int[] array = {i, a, move[0], move[1]};
                                 legalMoves.add(array);
@@ -541,6 +577,118 @@ public class Board extends Group {
 
         clone.setTile(selectedTile, playingAsWhite);
 
+
+        clone.playMove(clone, selectedTile, row, col);
+
+
+        if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
+
+            if (clone.isWhiteKingInCheck(clone)) {
+
+                return false;
+            }
+
+        }
+        else {
+            if (clone.isBlackKingInCheck(clone)) {
+
+                return false;
+            }
+
+        }
+
+
+        return true;
+    }
+
+
+
+
+    public void removeBlackPawnEnPassant() {
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    Piece piece = getTile(i, a).getPiece();
+                    if (piece.getName().equals("Pawn") && piece.color.equals("black")) {
+                        Pawn pawn = (Pawn) piece;
+                        pawn.set_en_passant(false);
+
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void removeWhitePawnEnPassant() {
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    Piece piece = getTile(i, a).getPiece();
+                    if (piece.getName().equals("Pawn") && piece.color.equals("white")) {
+                        Pawn pawn = (Pawn) piece;
+                        pawn.set_en_passant(false);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public int getBlackValue() {
+        int sum = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    if (getTile(i, a).getPiece().getColor().equals("black")) {
+                        Piece piece = getTile(i, a).getPiece();
+                        sum += piece.getValue();
+
+                    }
+                }
+            }
+        }
+        return sum;
+    }
+
+    public int getWhiteValue() {
+        int sum = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a < 8; a++) {
+                if (getTile(i, a).isOccupied()) {
+                    if (getTile(i, a).getPiece().getColor().equals("white")) {
+                        Piece piece = getTile(i, a).getPiece();
+                        sum += piece.getValue();
+                    }
+                }
+            }
+        }
+        return sum;
+    }
+
+    public void printBoard(Board board) {
+        System.out.println();
+        for (int i = 7; i >= 0; i--) {
+            System.out.println("\nROW " + i + "\n" );
+            for (int a = 0; a < 8; a++) {
+                if (board.getTile(i, a).isOccupied()) {
+                    System.out.println(board.getTile(i, a).getPiece().getColor() + " " + board.getTile(i, a).getPiece().getName());
+                } else {
+                    System.out.println("EMPTY");
+                }
+            }
+
+        }
+        System.out.println();
+    }
+
+    public void playMove(Board clone, Tile selectedTile, int row, int col) throws IOException {
+        //System.out.println();
+        //.println("SELECTED TILE ROW: " + selectedTile.getRow() + " SELECTED TILE COLUMN: " + selectedTile.getColumn());
+        //System.out.println("ROW: " + row + " COL: " + col);
+        //System.out.println();
+        //System.out.println("PREVIOUS BOARD");
+        //clone.printBoard(clone);
         boolean moveDone = false;
 
         if (selectedTile.getPiece().getName().equals("Pawn")) {
@@ -573,8 +721,7 @@ public class Board extends Group {
                     moveDone = true;
 
 
-                }
-                else if (row == 0) {
+                } else if (row == 0) {
 
 
                     Tile tile = clone.getTile(row, col);
@@ -604,8 +751,7 @@ public class Board extends Group {
                 moveDone = true;
 
 
-            }
-            else if (row == 0) {
+            } else if (row == 0) {
 
 
                 Tile tile = clone.getTile(row, col);
@@ -620,7 +766,6 @@ public class Board extends Group {
 
 
             }
-
 
 
         }
@@ -706,7 +851,6 @@ public class Board extends Group {
                         moveDone = true;
 
 
-
                     } else if (row == 7 && col == 2) {
                         Tile tile = clone.getTile(7, 0);
                         Rook rook = (Rook) clone.getTile(7, 0).getPiece();
@@ -742,7 +886,6 @@ public class Board extends Group {
         }
 
 
-
         if (!moveDone) {
 
 
@@ -756,60 +899,21 @@ public class Board extends Group {
 
         }
 
-
-        if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
-
-            if (clone.isWhiteKingInCheck(clone)) {
-
-                return false;
-            }
-
-        }
-        else {
-            if (clone.isBlackKingInCheck(clone)) {
-
-                return false;
-            }
-
+        if (clone.getTurn() % 2 == 1) {
+            clone.removeBlackPawnEnPassant();
+        } else {
+            clone.removeWhitePawnEnPassant();
         }
 
+        clone.setTurn(clone.getTurn() + 1);
 
-        return true;
+
+
+
+        //System.out.println("AFTER BOARD");
+        //clone.printBoard(clone);
     }
 
-
-
-
-    public void removeBlackPawnEnPassant() {
-        for (int i = 0; i < 8; i++) {
-            for (int a = 0; a < 8; a++) {
-                if (getTile(i, a).isOccupied()) {
-                    Piece piece = getTile(i, a).getPiece();
-                    if (piece.getName().equals("Pawn") && piece.color.equals("black")) {
-                        Pawn pawn = (Pawn) piece;
-                        pawn.set_en_passant(false);
-
-                    }
-
-                }
-            }
-        }
-    }
-
-    public void removeWhitePawnEnPassant() {
-        for (int i = 0; i < 8; i++) {
-            for (int a = 0; a < 8; a++) {
-                if (getTile(i, a).isOccupied()) {
-                    Piece piece = getTile(i, a).getPiece();
-                    if (piece.getName().equals("Pawn") && piece.color.equals("white")) {
-                        Pawn pawn = (Pawn) piece;
-                        pawn.set_en_passant(false);
-                    }
-
-                }
-            }
-        }
-    }
 
 
 

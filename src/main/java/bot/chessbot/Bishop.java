@@ -32,6 +32,11 @@ public class Bishop extends Piece{
     }
 
     @Override
+    public int getValue() {
+        return 3;
+    }
+
+    @Override
     public Piece clonePiece(Piece x) {
 
         return new Bishop(row, col, color);

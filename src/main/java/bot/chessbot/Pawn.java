@@ -37,6 +37,11 @@ public class Pawn extends Piece{
     }
 
     @Override
+    public int getValue() {
+        return 1;
+    }
+
+    @Override
     public Piece clonePiece(Piece x) {
         Pawn pawn = new Pawn(row, col, color);
         pawn.set_en_passant(pawn.can_be_en_passant);

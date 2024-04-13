@@ -38,6 +38,11 @@ public class Rook extends Piece{
     }
 
     @Override
+    public int getValue() {
+        return 5;
+    }
+
+    @Override
     public Piece clonePiece(Piece x) {
         Rook rook = new Rook(row, col, color);
         rook.setCastle(rook.getCanCastle());

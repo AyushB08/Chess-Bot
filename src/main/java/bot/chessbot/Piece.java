@@ -42,6 +42,10 @@ public abstract class Piece {
 
     public abstract ArrayList<int[]> getValidMoves(Board board) throws IOException;
 
+    public abstract int getValue();
+
+
+
 
 
 

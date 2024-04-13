@@ -2,230 +2,247 @@ package bot.chessbot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Engine {
 
+    Board board = BoardViewer.board;
+
     public void playRandomMove(Board board) throws IOException {
-        ArrayList<int[]> moves = board.getLegalMoves();
+        ArrayList<int[]> moves = board.getLegalMoves(board);
         int n = (int) (Math.random() * moves.size());
         int[] move = moves.get(n);
         Tile selectedTile = board.getTile(move[0], move[1]);
         int row = move[2];
         int col = move[3];
 
-        boolean moveDone = false;
-
-        if (selectedTile.getPiece().getName().equals("Pawn")) {
-            if (Math.abs(row - selectedTile.getRow()) == 2) {
-                Pawn pawn = (Pawn) selectedTile.getPiece();
-                pawn.set_en_passant(true);
-            } else if (Math.abs(row - selectedTile.getRow()) == 1 && Math.abs(col - selectedTile.getColumn()) == 1) {
-                if (!board.getTile(row, col).isOccupied()) {
-                    Pawn pawn = (Pawn) selectedTile.getPiece();
-                    Tile tile = board.getTile(selectedTile.getRow(), col);
-
-                    tile.setOccupied(false);
-                    selectedTile.setOccupied(false);
-                    pawn.setRow(row);
-                    pawn.setCol(col);
-
-                }
-
-                if (row == 7) {
+        board.playMove(board, selectedTile, row, col);
 
 
-                    Tile tile = board.getTile(row, col);
+    }
 
-                    tile.setOccupied(true);
-                    selectedTile.setOccupied(false);
-
-                    Queen queen = new Queen(7, col, "white");
-                    tile.setPiece(queen);
-
-                    moveDone = true;
+    public void playBestMove(Board board) throws IOException {
+        int[] move = findBestMove(board);
+        Tile tile = board.getTile(move[0], move[1]);
+        board.playMove(board, tile, move[2], move[3]);
+    }
 
 
-                }
-                else if (row == 0) {
+    public int[] findBestMove(Board board) throws IOException {
+
+        int bestVal = Integer.MAX_VALUE;
 
 
-                    Tile tile = board.getTile(row, col);
+        ArrayList<int[]> legalMoves = board.getLegalMoves(board);
+        ArrayList<int[]> possibleMoves = new ArrayList<>();
+        for (int[] move : legalMoves) {
 
-                    tile.setOccupied(true);
-                    selectedTile.setOccupied(false);
+            Board clone = board.cloneBoard(board);
 
-                    Queen queen = new Queen(0, col, "black");
-                    tile.setPiece(queen);
+            Tile selectedTile = clone.getTile(move[0], move[1]);
+            clone.playMove(clone, selectedTile, move[2], move[3]);
 
-                    moveDone = true;
+            int value = minimax(clone, 0, false, 4, Integer.MAX_VALUE, Integer.MIN_VALUE);
+            System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
 
+            if (value < bestVal) {
 
-                }
+                bestVal = value;
+                possibleMoves = new ArrayList<>();
+                possibleMoves.add(move);
+
+            } else if (value == bestVal) {
+                possibleMoves.add(move);
             }
-            if (row == 7) {
-
-
-                Tile tile = board.getTile(row, col);
-
-                tile.setOccupied(true);
-                selectedTile.setOccupied(false);
-
-                Queen queen = new Queen(7, col, "white");
-                tile.setPiece(queen);
-
-                moveDone = true;
-
-
-            }
-            else if (row == 0) {
-
-
-                Tile tile = board.getTile(row, col);
-
-                tile.setOccupied(true);
-                selectedTile.setOccupied(false);
-
-                Queen queen = new Queen(0, col, "black");
-                tile.setPiece(queen);
-
-                moveDone = true;
-
-
-            }
-
-
-
         }
-        if (selectedTile.getPiece().getName().equals("Rook")) {
 
-            Rook rook = (Rook) selectedTile.getPiece();
-            rook.setCastle(false);
+        return possibleMoves.get((int)((Math.random() * possibleMoves.size())));
+
+    }
+
+
+    public int minimax(Board board, int depth, boolean isMaximizing, int maxDepth, int alpha, int beta) throws IOException {
+        System.out.println("IS MAXIMIZING: " + isMaximizing + " DEPTH: " + depth);
+        int value = getValueOfBoard(board);
+
+        if (value == 100 || value == -100) {
+            System.out.println("GAME ENDED CHECKMATE");
+            return value;
         }
-        if (selectedTile.getPiece().getName().equals("King")) {
+        if (board.isStalemate()) {
+            System.out.println("GAME ENDED STALEMATE");
+            return value;
+        }
 
-            King king = (King) selectedTile.getPiece();
+        if (depth >= maxDepth) {
+            return value;
+        }
 
-            if (king.canCastle) {
+        Board clone = board.cloneBoard(board);
+
+        int bestVal = 0;
+
+        ArrayList<int[]> legalMoves = clone.getLegalMoves(clone);
+
+        if (isMaximizing) {
+            bestVal = Integer.MIN_VALUE;
+            for (int[] legalMove : legalMoves) {
+
+                Board secondClone = clone.cloneBoard(clone);
+                Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
+                secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+                int boardValue = minimax(secondClone, depth+1, false, maxDepth, alpha, beta);
+                bestVal = Math.max(bestVal, boardValue);
+                alpha = Math.max(alpha, bestVal);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return bestVal;
+        }
+
+        else {
+            bestVal = Integer.MAX_VALUE;
+            for (int[] legalMove : legalMoves) {
+
+                Board secondClone = clone.cloneBoard(clone);
+                Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
+                secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+                int boardValue = minimax(secondClone, depth+1, true, maxDepth, alpha, beta);
+                bestVal = Math.min(bestVal, boardValue);
+                beta = Math.min(beta, bestVal);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return bestVal;
+        }
+
+                 /*
+    function minimax(node, depth, isMaximizingPlayer, alpha, beta):
+
+    if node is a leaf node :
+        return value of the node
+
+    if isMaximizingPlayer :
+        bestVal = -INFINITY
+        for each child node :
+            value = minimax(node, depth+1, false, alpha, beta)
+            bestVal = max( bestVal, value)
+            alpha = max( alpha, bestVal)
+            if beta <= alpha:
+                break
+        return bestVal
+
+    else :
+        bestVal = +INFINITY
+        for each child node :
+            value = minimax(node, depth+1, true, alpha, beta)
+            bestVal = min( bestVal, value)
+            beta = min( beta, bestVal)
+            if beta <= alpha:
+                break
+        return bestVal
+
+// Calling the function for the first time.
+minimax(0, 0, true, -INFINITY, +INFINITY)
+     */
+        /*
+        int bestVal;
+
+        int value = getValueOfBoard(board);
+
+        if (value == 100 || value == -100) {
+            System.out.println("GAME ENDED CHECKMATE");
+            return value;
+        }
+
+        if (board.isStalemate()) {
+            System.out.println("GAME ENDED STALEMATE");
+            return 0;
+        }
+
+        Board clone = board.cloneBoard(board);
+        ArrayList<int[]> legalMoves = clone.getLegalMoves(clone);
 
 
-                if (king.getColor().equals("white")) {
-                    if (row == 0 && col == 6) {
-                        Tile tile = board.getTile(0, 7);
-                        Rook rook = (Rook) board.getTile(0, 7).getPiece();
 
-                        tile.setOccupied(false);
+        if (isMaximizing) {
 
-                        selectedTile.setOccupied(false);
+            System.out.println("IS MAXIMIZING");
 
-
-                        board.getTile(0, 5).setOccupied(true);
-                        board.getTile(0, 5).setPiece(rook);
-                        board.getTile(0, 6).setOccupied(true);
-                        board.getTile(0, 6).setPiece(king);
-
-                        king.setRow(0);
-                        king.setCol(6);
-                        rook.setRow(0);
-                        rook.setCol(5);
-
-
-                        moveDone = true;
-
-
-                    } else if (row == 0 && col == 2) {
-                        Tile tile = board.getTile(0, 0);
-                        Rook rook = (Rook) board.getTile(0, 0).getPiece();
-
-
-                        tile.setOccupied(false);
-                        selectedTile.setOccupied(false);
-
-
-                        board.getTile(0, 2).setOccupied(true);
-                        board.getTile(0, 2).setPiece(king);
-                        board.getTile(0, 3).setOccupied(true);
-                        board.getTile(0, 3).setPiece(rook);
-
-                        king.setRow(0);
-                        king.setCol(2);
-                        rook.setRow(0);
-                        rook.setCol(3);
-
-
-                        moveDone = true;
-
-
-                    }
+            bestVal = -1000;
+            for (int[] move : legalMoves) {
+                Board secondClone = clone.cloneBoard(clone);
+                Tile selectedTile = secondClone.getTile(move[0], move[1]);
+                secondClone.playMove(secondClone, selectedTile, move[2], move[3]);
+                if (depth >= maxDepth) {
+                    int y = getValueOfBoard(secondClone);
+                    System.out.println("Maximizing VALUE: " + y + " " + Arrays.toString(move) + " DEPTH");
+                    return y;
                 } else {
-                    if (row == 7 && col == 6) {
-                        Tile tile = board.getTile(7, 7);
-                        Rook rook = (Rook) board.getTile(7, 7).getPiece();
-
-                        tile.setOccupied(false);
-                        selectedTile.setOccupied(false);
-
-
-                        board.getTile(7, 5).setOccupied(true);
-                        board.getTile(7, 5).setPiece(rook);
-                        board.getTile(7, 6).setOccupied(true);
-                        board.getTile(7, 6).setPiece(king);
-
-                        king.setRow(7);
-                        king.setCol(6);
-                        rook.setRow(7);
-                        rook.setCol(5);
-
-                        moveDone = true;
-
-
-
-                    } else if (row == 7 && col == 2) {
-                        Tile tile = board.getTile(7, 0);
-                        Rook rook = (Rook) board.getTile(7, 0).getPiece();
-
-                        tile.setOccupied(false);
-                        selectedTile.setOccupied(false);
-
-
-                        board.getTile(7, 2).setOccupied(true);
-                        board.getTile(7, 2).setPiece(king);
-
-                        board.getTile(7, 3).setOccupied(true);
-                        board.getTile(7, 3).setPiece(rook);
-
-                        king.setRow(7);
-                        king.setCol(2);
-                        rook.setRow(7);
-                        rook.setCol(3);
-
-
-                        moveDone = true;
-
-
-                    }
+                    bestVal = Math.max(bestVal, minimax(secondClone, depth + 1, false, maxDepth));
                 }
 
-
             }
+        } else {
 
-            king.setCastle(false);
+            System.out.println("IS MINIMIZING");
+
+            bestVal = 1000;
+
+            for (int[] move : legalMoves) {
+                int currValue = 1000;
+
+                Board secondClone = clone.cloneBoard(clone);
+                Tile selectedTile = secondClone.getTile(move[0], move[1]);
+
+                secondClone.playMove(secondClone, selectedTile, move[2], move[3]);
+
+                if (depth >= maxDepth) {
+                    int y = getValueOfBoard(secondClone);
+                    System.out.println("Minimizing VALUE: " + y + " " + Arrays.toString(move) + " DEPTH");
+                    return y;
+                } else {
+                    currValue = Math.min(currValue, minimax(secondClone, depth + 1, true, maxDepth));
+                    bestVal = Math.min(bestVal, minimax(secondClone, depth + 1, true, maxDepth));
+
+                }
+            }
 
 
         }
 
 
 
-        if (!moveDone) {
+
+        return bestVal;
+
+         */
+    }
 
 
-            board.getTile(row, col).setPiece(selectedTile.getPiece());
-            board.getTile(row, col).setOccupied(true);
-            selectedTile.getPiece().setRow(row);
-            selectedTile.getPiece().setCol(col);
-            selectedTile.setPiece(null);
-            selectedTile.setOccupied(false);
 
+    public int getValueOfBoard(Board board) throws IOException {
 
+        if (board.didWhiteWin()) {
+            return 100;
+        }
+
+        else if (board.didBlackWin()) {
+            return -100;
+        }
+
+        else if (board.isStalemate()) {
+            return 0;
+        }
+
+        else {
+            //.out.println("WHITE: " + board.getWhiteValue() + " BLACK: " + board.getBlackValue());
+            return board.getWhiteValue() - board.getBlackValue();
         }
     }
+
+
+
 }

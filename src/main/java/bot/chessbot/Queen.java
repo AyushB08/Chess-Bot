@@ -36,6 +36,11 @@ public class Queen extends Piece{
     }
 
     @Override
+    public int getValue() {
+        return 9;
+    }
+
+    @Override
     public Piece clonePiece(Piece x) {
         return new Queen(row, col, color);
     }
