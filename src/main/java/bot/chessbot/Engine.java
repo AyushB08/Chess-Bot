@@ -42,7 +42,7 @@ public class Engine {
             Tile selectedTile = clone.getTile(move[0], move[1]);
             clone.playMove(clone, selectedTile, move[2], move[3]);
 
-            int value = minimax(clone, 0, false, 4, Integer.MAX_VALUE, Integer.MIN_VALUE);
+            int value = minimax(clone, 0, false, 5, Integer.MAX_VALUE, Integer.MIN_VALUE);
             System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
 
             if (value < bestVal) {
