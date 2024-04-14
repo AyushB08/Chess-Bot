@@ -13,6 +13,7 @@ public abstract class Piece {
     String image;
 
 
+
     public void setRow(int x) {
         row = x;
     }
@@ -42,7 +43,9 @@ public abstract class Piece {
 
     public abstract ArrayList<int[]> getValidMoves(Board board) throws IOException;
 
-    public abstract int getValue();
+    public abstract double getValue();
+
+    public abstract double getPositionValue();
 
 
 

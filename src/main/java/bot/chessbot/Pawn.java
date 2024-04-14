@@ -7,6 +7,17 @@ import static bot.chessbot.BoardViewer.board;
 
 public class Pawn extends Piece{
 
+    public static final double[][] PAWN_TABLE = {
+            { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 },
+            { 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0 },
+            { 1.0,  1.0,  2.0,  3.5,  3.5,  2.0,  1.0,  1.0 },
+            { 0.5,  0.5,  1.0,  3.0,  3.0,  1.0,  0.5,  0.5 },
+            { 0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
+            { 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5 },
+            { 0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5 },
+            { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 }
+    };
+
     boolean can_be_en_passant = false;
     public Pawn(int row, int col, String color) {
         this.row = row;
@@ -37,8 +48,17 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public int getValue() {
-        return 1;
+    public double getValue() {
+        return 10 + getPositionValue();
+    }
+
+    @Override
+    public double getPositionValue() {
+        if (this.color.equals("white")) {
+            return PAWN_TABLE[7-row][col];
+        } else {
+            return PAWN_TABLE[row][col];
+        }
     }
 
     @Override

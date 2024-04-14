@@ -32,6 +32,8 @@ public class BoardViewer extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
+
+
         BorderPane root = new BorderPane();
 
         board = new Board(true);
@@ -71,14 +73,16 @@ public class BoardViewer extends Application {
         @Override
         public void handle(MouseEvent e) {
 
-            if ((board.getPlayingAsWhite() && board.getTurn() % 2 == 1) || (!board.getPlayingAsWhite() && board.getTurn() % 2 == 0)) {
+            int row = board.rowForYPos(e.getY());
+            int col = board.colForXPos(e.getX());
+
+            if ((board.getPlayingAsWhite() && board.getTurn() % 2 == 1) || (!board.getPlayingAsWhite() && board.getTurn() % 2 == 0) && row < 8 && col < 8) {
 
 
 
 
 
-                int row = board.rowForYPos(e.getY());
-                int col = board.colForXPos(e.getX());
+
 
 
                 boolean moveDone = false;
@@ -393,11 +397,9 @@ public class BoardViewer extends Application {
 
 
                 try {
-
                     board.drawBoard();
 
                     if (moveDone) {
-
                         try {
 
                             String color = "";
@@ -430,9 +432,14 @@ public class BoardViewer extends Application {
                             PauseTransition delay = new PauseTransition(Duration.seconds(1));
                             delay.setOnFinished(event -> {
                                 try {
-
+                                    long startTime = System.nanoTime();
                                     engine.playBestMove(board);
                                     board.drawBoard();
+                                    long endTime = System.nanoTime();
+                                    long executionTime = (endTime - startTime) / 1000000;
+                                    System.out.println("TIME TAKEN: " + executionTime);
+                                    System.out.println("# OF POSITIONS: " + Engine.counter);
+                                    Engine.counter = 0;
                                     //board.setTurn(board.getTurn() + 1);
 
                                 } catch (IOException ex) {

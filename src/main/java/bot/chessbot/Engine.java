@@ -8,6 +8,8 @@ public class Engine {
 
     Board board = BoardViewer.board;
 
+    static int counter = 0;
+
     public void playRandomMove(Board board) throws IOException {
         ArrayList<int[]> moves = board.getLegalMoves(board);
         int n = (int) (Math.random() * moves.size());
@@ -17,8 +19,6 @@ public class Engine {
         int col = move[3];
 
         board.playMove(board, selectedTile, row, col);
-
-
     }
 
     public void playBestMove(Board board) throws IOException {
@@ -30,20 +30,24 @@ public class Engine {
 
     public int[] findBestMove(Board board) throws IOException {
 
-        int bestVal = Integer.MAX_VALUE;
+        double bestVal = Integer.MAX_VALUE;
 
 
         ArrayList<int[]> legalMoves = board.getLegalMoves(board);
+
         ArrayList<int[]> possibleMoves = new ArrayList<>();
         for (int[] move : legalMoves) {
 
+            counter += 1;
+            //System.out.println("NEXT MOVE: " + Arrays.toString(move));
+            System.out.println("CLONED IN MINIMAX");
             Board clone = board.cloneBoard(board);
 
             Tile selectedTile = clone.getTile(move[0], move[1]);
             clone.playMove(clone, selectedTile, move[2], move[3]);
 
-            int value = minimax(clone, 0, false, 5, Integer.MAX_VALUE, Integer.MIN_VALUE);
-            System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
+            double value = minimax(clone, 0, true, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            //System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
 
             if (value < bestVal) {
 
@@ -61,37 +65,40 @@ public class Engine {
     }
 
 
-    public int minimax(Board board, int depth, boolean isMaximizing, int maxDepth, int alpha, int beta) throws IOException {
-        System.out.println("IS MAXIMIZING: " + isMaximizing + " DEPTH: " + depth);
-        int value = getValueOfBoard(board);
+    public double minimax(Board board, int depth, boolean isMaximizing, int maxDepth, double alpha, double beta) throws IOException {
+        //System.out.println("IS MAXIMIZING: " + isMaximizing + " DEPTH: " + depth);
+        //board.printBoard(board);
+        double value = getValueOfBoard(board);
 
-        if (value == 100 || value == -100) {
-            System.out.println("GAME ENDED CHECKMATE");
+        if (value == 10000 || value == -10000) {
+            //System.out.println("GAME ENDED CHECKMATE");
             return value;
         }
         if (board.isStalemate()) {
-            System.out.println("GAME ENDED STALEMATE");
+            //System.out.println("GAME ENDED STALEMATE");
             return value;
         }
 
         if (depth >= maxDepth) {
             return value;
         }
-
+        System.out.println("CLONED IN MINIMAX");
         Board clone = board.cloneBoard(board);
 
-        int bestVal = 0;
+        double bestVal = 0;
 
         ArrayList<int[]> legalMoves = clone.getLegalMoves(clone);
 
         if (isMaximizing) {
             bestVal = Integer.MIN_VALUE;
             for (int[] legalMove : legalMoves) {
-
+                counter += 1;
+                //System.out.println("IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove));
+                System.out.println("CLONED IN MINIMAX");
                 Board secondClone = clone.cloneBoard(clone);
                 Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
                 secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
-                int boardValue = minimax(secondClone, depth+1, false, maxDepth, alpha, beta);
+                double boardValue = minimax(secondClone, depth+1, false, maxDepth, alpha, beta);
                 bestVal = Math.max(bestVal, boardValue);
                 alpha = Math.max(alpha, bestVal);
                 if (beta <= alpha) {
@@ -104,14 +111,18 @@ public class Engine {
         else {
             bestVal = Integer.MAX_VALUE;
             for (int[] legalMove : legalMoves) {
-
+                counter += 1;
+                //System.out.println("IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove));
+                System.out.println("CLONED IN MINIMAX");
                 Board secondClone = clone.cloneBoard(clone);
                 Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
                 secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
-                int boardValue = minimax(secondClone, depth+1, true, maxDepth, alpha, beta);
+                double boardValue = minimax(secondClone, depth+1, true, maxDepth, alpha, beta);
+                //System.out.println("BOARD VALUE OF " + "IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove) + " IS " + boardValue +"\n");
                 bestVal = Math.min(bestVal, boardValue);
                 beta = Math.min(beta, bestVal);
                 if (beta <= alpha) {
+                    //System.out.println("BROKE HERE");
                     break;
                 }
             }
@@ -119,7 +130,7 @@ public class Engine {
         }
 
                  /*
-    function minimax(node, depth, isMaximizingPlayer, alpha, beta):
+    functioÍn minimax(node, depth, isMaximizingPlayer, alpha, beta):
 
     if node is a leaf node :
         return value of the node
@@ -223,14 +234,14 @@ minimax(0, 0, true, -INFINITY, +INFINITY)
 
 
 
-    public int getValueOfBoard(Board board) throws IOException {
+    public double getValueOfBoard(Board board) throws IOException {
 
         if (board.didWhiteWin()) {
-            return 100;
+            return 10000;
         }
 
         else if (board.didBlackWin()) {
-            return -100;
+            return -10000;
         }
 
         else if (board.isStalemate()) {

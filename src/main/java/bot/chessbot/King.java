@@ -6,6 +6,18 @@ import java.util.ArrayList;
 import static bot.chessbot.BoardViewer.board;
 
 public class King extends Piece{
+
+    public static final double[][] KING_TABLE = {
+            { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
+            { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
+            { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
+            { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
+            { -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0 },
+            { -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0 },
+            {  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 },
+            {  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 }
+    };
+
     boolean canCastle = true;
     public King(int row, int col, String color) {
         this.row = row;
@@ -31,8 +43,17 @@ public class King extends Piece{
     }
 
     @Override
-    public int getValue() {
-        return 1000;
+    public double getValue() {
+        return 900 + getPositionValue();
+    }
+
+    @Override
+    public double getPositionValue() {
+        if (this.color.equals("white")) {
+            return KING_TABLE[7-row][col];
+        } else {
+            return KING_TABLE[row][col];
+        }
     }
 
     public ArrayList<int[]> getValidMovesWithoutCastle(Board board) throws IOException {

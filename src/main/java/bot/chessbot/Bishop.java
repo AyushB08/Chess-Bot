@@ -7,6 +7,18 @@ import static bot.chessbot.BoardViewer.board;
 
 public class Bishop extends Piece{
 
+    public static final double[][] BISHOP_TABLE = {
+            { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 },
+            { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
+            { -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0 },
+            { -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0 },
+            { -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0 },
+            { -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0 },
+            { -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0 },
+            { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 }
+    };
+
+
     public Bishop(int row, int col, String color) {
         this.row = row;
         this.col = col;
@@ -32,8 +44,17 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public int getValue() {
-        return 3;
+    public double getValue() {
+        return 30 + getPositionValue();
+    }
+
+    @Override
+    public double getPositionValue() {
+        if (this.color.equals("white")) {
+            return BISHOP_TABLE[7-row][col];
+        } else {
+            return BISHOP_TABLE[row][col];
+        }
     }
 
     @Override

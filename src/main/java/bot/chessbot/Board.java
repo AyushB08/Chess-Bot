@@ -456,6 +456,9 @@ public class Board extends Group {
     }
 
     public Board cloneBoard(Board x) throws IOException {
+
+        long startTime = System.nanoTime();
+
         Board clone = new Board(false);
         clone.setTurn(x.getTurn());
         clone.playingAsWhite  = x.getPlayingAsWhite();
@@ -464,7 +467,13 @@ public class Board extends Group {
                 clone.setTile(x.getTile(i, a).cloneTile(x.getTile(i, a)), playingAsWhite);
             }
         }
+
+        long endTime = System.nanoTime();
+        long executionTime = (endTime - startTime) / 1000000;
+        System.out.println("TIME TAKEN TO CLONE: " + executionTime);
         return clone;
+
+
     }
 
     public boolean isStalemate() throws IOException {
@@ -500,7 +509,7 @@ public class Board extends Group {
     }
 
     public boolean isGameOver(Board board) throws IOException {
-
+        System.out.println("WENT TO GAMEOVER");
 
         for (int i = 0; i < 8; i++) {
 
@@ -570,7 +579,7 @@ public class Board extends Group {
 
     public boolean testMove(Tile chosenTile, int row, int col) throws IOException {
 
-
+        System.out.println("CLONED IN TESTMOVE");
         Board clone = cloneBoard(this);
 
         Tile selectedTile = chosenTile.cloneTile(chosenTile);
@@ -584,10 +593,8 @@ public class Board extends Group {
         if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
 
             if (clone.isWhiteKingInCheck(clone)) {
-
                 return false;
             }
-
         }
         else {
             if (clone.isBlackKingInCheck(clone)) {
@@ -635,7 +642,7 @@ public class Board extends Group {
         }
     }
 
-    public int getBlackValue() {
+    public double getBlackValue() {
         int sum = 0;
         for (int i = 0; i < 8; i++) {
             for (int a = 0; a < 8; a++) {
@@ -651,7 +658,7 @@ public class Board extends Group {
         return sum;
     }
 
-    public int getWhiteValue() {
+    public double getWhiteValue() {
         int sum = 0;
         for (int i = 0; i < 8; i++) {
             for (int a = 0; a < 8; a++) {
@@ -669,14 +676,15 @@ public class Board extends Group {
     public void printBoard(Board board) {
         System.out.println();
         for (int i = 7; i >= 0; i--) {
-            System.out.println("\nROW " + i + "\n" );
+            System.out.print("ROW " + i);
             for (int a = 0; a < 8; a++) {
                 if (board.getTile(i, a).isOccupied()) {
-                    System.out.println(board.getTile(i, a).getPiece().getColor() + " " + board.getTile(i, a).getPiece().getName());
+                    System.out.printf("%15s",(board.getTile(i, a).getPiece().getColor() + " " + board.getTile(i, a).getPiece().getName()));
                 } else {
-                    System.out.println("EMPTY");
+                    System.out.printf("%15s","EMPTY");
                 }
             }
+            System.out.println();
 
         }
         System.out.println();
@@ -779,7 +787,7 @@ public class Board extends Group {
             King king = (King) selectedTile.getPiece();
 
             if (king.canCastle) {
-
+                king.setCastle(false);
 
                 if (king.getColor().equals("white")) {
                     if (row == 0 && col == 6) {
@@ -833,6 +841,9 @@ public class Board extends Group {
                     if (row == 7 && col == 6) {
                         Tile tile = clone.getTile(7, 7);
                         Rook rook = (Rook) clone.getTile(7, 7).getPiece();
+                        if (rook == null) {
+                            System.out.println("FOUND BUG");
+                        }
 
                         tile.setOccupied(false);
                         selectedTile.setOccupied(false);
@@ -849,6 +860,7 @@ public class Board extends Group {
                         rook.setCol(5);
 
                         moveDone = true;
+
 
 
                     } else if (row == 7 && col == 2) {

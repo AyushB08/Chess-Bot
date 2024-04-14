@@ -7,6 +7,17 @@ import static bot.chessbot.BoardViewer.board;
 
 public class Rook extends Piece{
 
+    public static final double[][] ROOK_TABLE = {
+            { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 },
+            { 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5 },
+            { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
+            { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
+            { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
+            { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
+            { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
+            { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0 }
+    };
+
     String rookCastle;
     boolean canCastle = true;
 
@@ -38,14 +49,25 @@ public class Rook extends Piece{
     }
 
     @Override
-    public int getValue() {
-        return 5;
+    public double getValue() {
+        return 50 + getPositionValue();
     }
+
+    @Override
+    public double getPositionValue() {
+        if (this.color.equals("white")) {
+            return ROOK_TABLE[7-row][col];
+        } else {
+            return ROOK_TABLE[row][col];
+        }
+
+    }
+
 
     @Override
     public Piece clonePiece(Piece x) {
         Rook rook = new Rook(row, col, color);
-        rook.setCastle(rook.getCanCastle());
+        rook.setCastle(this.getCanCastle());
         rook.rookCastle = this.rookCastle;
         return rook;
     }

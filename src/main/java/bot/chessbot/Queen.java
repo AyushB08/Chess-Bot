@@ -7,6 +7,18 @@ import static bot.chessbot.BoardViewer.board;
 
 public class Queen extends Piece{
 
+    public static final double[][] QUEEN_TABLE = {
+            { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 },
+            { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
+            { -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0 },
+            { -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
+            {  0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
+            { -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0 },
+            { -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0 },
+            { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 }
+    };
+
+
     public Queen(int row, int col, String color) {
         this.row = row;
         this.col = col;
@@ -36,8 +48,18 @@ public class Queen extends Piece{
     }
 
     @Override
-    public int getValue() {
-        return 9;
+    public double getValue() {
+        return 90 + getPositionValue();
+    }
+
+    @Override
+    public double getPositionValue() {
+
+        if (this.color.equals("white")) {
+            return QUEEN_TABLE[7-row][col];
+        } else {
+            return QUEEN_TABLE[row][col];
+        }
     }
 
     @Override
