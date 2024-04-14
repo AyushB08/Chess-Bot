@@ -509,7 +509,6 @@ public class Board extends Group {
     }
 
     public boolean isGameOver(Board board) throws IOException {
-        System.out.println("WENT TO GAMEOVER");
 
         for (int i = 0; i < 8; i++) {
 

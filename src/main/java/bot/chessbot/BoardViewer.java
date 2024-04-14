@@ -22,6 +22,8 @@ public class BoardViewer extends Application {
     boolean selectedTileBool = false;
     Tile selectedTile;
 
+    static BorderPane root;
+
     public BoardViewer() throws IOException {
     }
 
@@ -34,7 +36,7 @@ public class BoardViewer extends Application {
 
 
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
 
         board = new Board(true);
         board.setOnMouseClicked(new tileEventHandler());
@@ -68,7 +70,9 @@ public class BoardViewer extends Application {
 
     }
 
+
     private class tileEventHandler implements EventHandler<MouseEvent> {
+
 
         @Override
         public void handle(MouseEvent e) {
@@ -77,9 +81,6 @@ public class BoardViewer extends Application {
             int col = board.colForXPos(e.getX());
 
             if ((board.getPlayingAsWhite() && board.getTurn() % 2 == 1) || (!board.getPlayingAsWhite() && board.getTurn() % 2 == 0) && row < 8 && col < 8) {
-
-
-
 
 
 

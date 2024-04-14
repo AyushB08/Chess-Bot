@@ -8,7 +8,11 @@ public class Engine {
 
     Board board = BoardViewer.board;
 
+
     static int counter = 0;
+
+    public Engine() throws IOException {
+    }
 
     public void playRandomMove(Board board) throws IOException {
         ArrayList<int[]> moves = board.getLegalMoves(board);
@@ -19,6 +23,8 @@ public class Engine {
         int col = move[3];
 
         board.playMove(board, selectedTile, row, col);
+
+
     }
 
     public void playBestMove(Board board) throws IOException {
@@ -45,6 +51,7 @@ public class Engine {
 
             Tile selectedTile = clone.getTile(move[0], move[1]);
             clone.playMove(clone, selectedTile, move[2], move[3]);
+
 
             double value = minimax(clone, 0, true, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
             //System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
@@ -98,6 +105,8 @@ public class Engine {
                 Board secondClone = clone.cloneBoard(clone);
                 Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
                 secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+
+
                 double boardValue = minimax(secondClone, depth+1, false, maxDepth, alpha, beta);
                 bestVal = Math.max(bestVal, boardValue);
                 alpha = Math.max(alpha, bestVal);
@@ -114,9 +123,11 @@ public class Engine {
                 counter += 1;
                 //System.out.println("IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove));
                 System.out.println("CLONED IN MINIMAX");
+
                 Board secondClone = clone.cloneBoard(clone);
                 Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
                 secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+
                 double boardValue = minimax(secondClone, depth+1, true, maxDepth, alpha, beta);
                 //System.out.println("BOARD VALUE OF " + "IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove) + " IS " + boardValue +"\n");
                 bestVal = Math.min(bestVal, boardValue);
