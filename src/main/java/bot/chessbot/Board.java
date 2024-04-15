@@ -76,7 +76,17 @@ public class Board extends Group {
     }
 
 
+    public void setBoard(Board clone) throws IOException {
+        for (int i = 0; i < 8; i++) {
+            for (int a = 0; a  < 8; a++ ) {
+                setTile(clone.getTile(i, a), playingAsWhite);
+            }
+        }
+        setTurn(clone.getTurn());
+        playingAsWhite  = clone.getPlayingAsWhite();
+        drawBoard();
 
+    }
     public int colForXPos(double x) {
 
         if (playingAsWhite) {
@@ -526,7 +536,7 @@ public class Board extends Group {
                             int[] move = moves.get(c);
                             Tile chosen = getTile(i, a);
                             //System.out.println("Went in is game over");
-                            if (this.testMove(chosen, move[0], move[1])) {
+                            if (this.testMove(chosen, move[0], move[1]) != null) {
 
                                 return false;
 
@@ -541,8 +551,8 @@ public class Board extends Group {
         return true;
     }
 
-    public ArrayList<int[]> getLegalMoves(Board board) throws IOException {
-        ArrayList<int[]> legalMoves = new ArrayList<>();
+    public ArrayList<Board> getLegalMoves(Board board) throws IOException {
+        ArrayList<Board> legalMoves = new ArrayList<>();
 
         for (int i = 0; i < 8; i++) {
 
@@ -560,10 +570,12 @@ public class Board extends Group {
 
                             Tile chosen = board.getTile(i, a);
                             //System.out.println("went in getLegalMoves");
-                            if (board.testMove(chosen, move[0], move[1])) {
+                            Board clone = board.testMove(chosen, move[0], move[1]);
+                            if (clone != null) {
 
                                 int[] array = {i, a, move[0], move[1]};
-                                legalMoves.add(array);
+                                legalMoves.add(clone);
+                                //printBoard(clone);
 
                             }
                         }
@@ -576,7 +588,7 @@ public class Board extends Group {
         return legalMoves;
     }
 
-    public boolean testMove(Tile chosenTile, int row, int col) throws IOException {
+    public Board testMove(Tile chosenTile, int row, int col) throws IOException {
 
         System.out.println("CLONED IN TESTMOVE");
         Board clone = cloneBoard(this);
@@ -592,19 +604,19 @@ public class Board extends Group {
         if (clone.getTile(row, col).getPiece().getColor().equals("white")) {
 
             if (clone.isWhiteKingInCheck(clone)) {
-                return false;
+                return null;
             }
         }
         else {
             if (clone.isBlackKingInCheck(clone)) {
 
-                return false;
+                return null;
             }
 
         }
 
 
-        return true;
+        return clone;
     }
 
 

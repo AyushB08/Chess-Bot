@@ -15,42 +15,38 @@ public class Engine {
     }
 
     public void playRandomMove(Board board) throws IOException {
-        ArrayList<int[]> moves = board.getLegalMoves(board);
+        ArrayList<Board> moves = board.getLegalMoves(board);
         int n = (int) (Math.random() * moves.size());
-        int[] move = moves.get(n);
-        Tile selectedTile = board.getTile(move[0], move[1]);
-        int row = move[2];
-        int col = move[3];
+        Board move = moves.get(n);
 
-        board.playMove(board, selectedTile, row, col);
+        board.setBoard(move);
+
+
 
 
     }
 
     public void playBestMove(Board board) throws IOException {
-        int[] move = findBestMove(board);
-        Tile tile = board.getTile(move[0], move[1]);
-        board.playMove(board, tile, move[2], move[3]);
+        Board newBoard = findBestMove(board);
+        //newBoard.printBoard(newBoard);
+        board.setBoard(newBoard);
     }
 
 
-    public int[] findBestMove(Board board) throws IOException {
+    public Board findBestMove(Board board) throws IOException {
 
         double bestVal = Integer.MAX_VALUE;
 
 
-        ArrayList<int[]> legalMoves = board.getLegalMoves(board);
-
-        ArrayList<int[]> possibleMoves = new ArrayList<>();
-        for (int[] move : legalMoves) {
+        ArrayList<Board> legalMoves = board.getLegalMoves(board);
+        System.out.println(legalMoves.size());
+        legalMoves.get(0).printBoard(legalMoves.get(0));
+        ArrayList<Board> possibleMoves = new ArrayList<>();
+        for (Board clone : legalMoves) {
 
             counter += 1;
             //System.out.println("NEXT MOVE: " + Arrays.toString(move));
             System.out.println("CLONED IN MINIMAX");
-            Board clone = board.cloneBoard(board);
-
-            Tile selectedTile = clone.getTile(move[0], move[1]);
-            clone.playMove(clone, selectedTile, move[2], move[3]);
 
 
             double value = minimax(clone, 0, true, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -60,10 +56,10 @@ public class Engine {
 
                 bestVal = value;
                 possibleMoves = new ArrayList<>();
-                possibleMoves.add(move);
+                possibleMoves.add(clone);
 
             } else if (value == bestVal) {
-                possibleMoves.add(move);
+                possibleMoves.add(clone);
             }
         }
 
@@ -94,17 +90,15 @@ public class Engine {
 
         double bestVal = 0;
 
-        ArrayList<int[]> legalMoves = clone.getLegalMoves(clone);
+        ArrayList<Board> legalMoves = clone.getLegalMoves(clone);
 
         if (isMaximizing) {
             bestVal = Integer.MIN_VALUE;
-            for (int[] legalMove : legalMoves) {
+            for (Board secondClone : legalMoves) {
                 counter += 1;
                 //System.out.println("IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove));
                 System.out.println("CLONED IN MINIMAX");
-                Board secondClone = clone.cloneBoard(clone);
-                Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
-                secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+
 
 
                 double boardValue = minimax(secondClone, depth+1, false, maxDepth, alpha, beta);
@@ -119,14 +113,12 @@ public class Engine {
 
         else {
             bestVal = Integer.MAX_VALUE;
-            for (int[] legalMove : legalMoves) {
+            for (Board secondClone : legalMoves) {
                 counter += 1;
                 //System.out.println("IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove));
                 System.out.println("CLONED IN MINIMAX");
 
-                Board secondClone = clone.cloneBoard(clone);
-                Tile selectedTile = secondClone.getTile(legalMove[0], legalMove[1]);
-                secondClone.playMove(secondClone, selectedTile, legalMove[2], legalMove[3]);
+
 
                 double boardValue = minimax(secondClone, depth+1, true, maxDepth, alpha, beta);
                 //System.out.println("BOARD VALUE OF " + "IN MINIMAX: IS MAXIMIZING " + isMaximizing + " MOVE: " + Arrays.toString(legalMove) + " IS " + boardValue +"\n");

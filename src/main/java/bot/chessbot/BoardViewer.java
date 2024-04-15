@@ -71,6 +71,8 @@ public class BoardViewer extends Application {
     }
 
 
+
+
     private class tileEventHandler implements EventHandler<MouseEvent> {
 
 
@@ -95,7 +97,7 @@ public class BoardViewer extends Application {
 
                 try {
                     if (selectedTileBool && (selectedTile.getColumn() != col || selectedTile.getRow() != row)) {
-                        if (board.testMove(selectedTile, row, col)) {
+                        if (board.testMove(selectedTile, row, col) != null) {
 
 
                             ArrayList<int[]> moves = null;
@@ -410,7 +412,7 @@ public class BoardViewer extends Application {
                                 color = "WHITE";
                             }
 
-                            ArrayList<int[]> array = board.getLegalMoves(board);
+                            ArrayList<Board> array = board.getLegalMoves(board);
                             System.out.println(color + " LEGAL MOVES LEFT: " + array.size());
 
                             if (board.didWhiteWin()) {
