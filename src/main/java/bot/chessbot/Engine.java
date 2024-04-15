@@ -50,7 +50,7 @@ public class Engine {
 
 
             double value = minimax(clone, 0, true, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            //System.out.println("\nMOVE: " + Arrays.toString(move) + " VALUE: " + value +"\n");
+
 
             if (value < bestVal) {
 
