@@ -5,8 +5,10 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -22,7 +24,7 @@ public class BoardViewer extends Application {
     boolean selectedTileBool = false;
     Tile selectedTile;
 
-    static BorderPane root;
+    static Pane root;
 
     public BoardViewer() throws IOException {
     }
@@ -36,16 +38,35 @@ public class BoardViewer extends Application {
 
 
 
-        root = new BorderPane();
+        root = new Pane();
 
         board = new Board(true);
         board.setOnMouseClicked(new tileEventHandler());
+        board.setLayoutX(300 - board.getBoundsInParent().getWidth()/2);
+        board.setLayoutY(300 - board.getBoundsInParent().getHeight()/2);
+
+
+        root.getChildren().add(board);
+
+        ComboBox<String> depthDropdown = new ComboBox<>();
+        depthDropdown.getItems().addAll("1", "2", "3", "4");
+        depthDropdown.setValue("1"); // Set default value
+        depthDropdown.setPrefWidth(60);
+        depthDropdown.setPrefHeight(30);
+        depthDropdown.setOnAction(event -> {
+            engine.maxDepth = Integer.parseInt(depthDropdown.getValue()) - 1;
+
+
+        });
+
+        depthDropdown.setLayoutX(300 - 30);
+        depthDropdown.setLayoutY(600 - 50 - 15);
+
+        root.getChildren().add(depthDropdown);
 
 
 
-        root.setCenter(board);
-
-        Scene scene = new Scene(root, 500, 500);
+        Scene scene = new Scene(root, 600, 600);
         stage.setTitle("Chess");
         stage.setResizable(false);
         stage.setScene(scene);

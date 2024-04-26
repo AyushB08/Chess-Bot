@@ -8,6 +8,8 @@ public class Engine {
 
     Board board = BoardViewer.board;
 
+    public int maxDepth = 0;
+
 
     static int counter = 0;
 
@@ -49,7 +51,7 @@ public class Engine {
             System.out.println("CLONED IN MINIMAX");
 
 
-            double value = minimax(clone, 0, true, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            double value = minimax(clone, 0, true, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
 
             if (value < bestVal) {
@@ -69,6 +71,7 @@ public class Engine {
 
 
     public double minimax(Board board, int depth, boolean isMaximizing, int maxDepth, double alpha, double beta) throws IOException {
+
         //System.out.println("IS MAXIMIZING: " + isMaximizing + " DEPTH: " + depth);
         //board.printBoard(board);
         double value = getValueOfBoard(board);
