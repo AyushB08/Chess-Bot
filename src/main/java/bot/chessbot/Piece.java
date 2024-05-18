@@ -14,6 +14,7 @@ public abstract class Piece {
 
 
 
+
     public void setRow(int x) {
         row = x;
     }
@@ -46,6 +47,8 @@ public abstract class Piece {
     public abstract double getValue();
 
     public abstract double getPositionValue();
+
+
 
 
 

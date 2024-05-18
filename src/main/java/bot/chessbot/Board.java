@@ -2,12 +2,10 @@ package bot.chessbot;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class Board extends Group {
@@ -465,6 +463,7 @@ public class Board extends Group {
         return false;
     }
 
+
     public Board cloneBoard(Board x) throws IOException {
 
         long startTime = System.nanoTime();
@@ -701,7 +700,57 @@ public class Board extends Group {
         System.out.println();
     }
 
+
+    public void goBackOneMove(Board x) {
+
+    }
+
+    public ArrayList<String> saveInformation(Piece piece, int row, int col) {
+
+
+        //Normal: Row, Col
+        //Rook: Row, Col, RookCastleType, CanCastle
+        //Pawn: Row, Col, CanBeEnPassant
+        //King: Row, Col, CanCastle
+
+        ArrayList<String> information = new ArrayList<>();
+
+        information.add(piece.getName());
+        information.add(row +"");
+        information.add(col+"");
+
+
+        if (piece.getName().equals("Rook")) {
+            Rook rook = (Rook) piece;
+            information.add(rook.getRookCastle());
+            information.add(rook.getCanCastle() + "");
+        }
+
+        else if (piece.getName().equals("King")) {
+            King king = (King) piece;
+            information.add(king.getCastle() + "");
+        }
+
+        else if (piece.getName().equals("Pawn")) {
+            Pawn pawn = (Pawn) piece;
+            information.add(pawn.can_be_en_passant() + "");
+        }
+
+        return information;
+
+    }
+
+    public void travelBack(Board board, ArrayList<ArrayList<String>> pieceInfo, ArrayList<String> promotionPiece ) {
+
+    }
     public void playMove(Board clone, Tile selectedTile, int row, int col) throws IOException {
+
+        ArrayList<ArrayList<String>> pieceInformation = new ArrayList<>();
+        ArrayList<String> promotionPiece = new ArrayList<>();
+
+        ArrayList<Piece> affectedPieces = new ArrayList<Piece>();
+        ArrayList<Piece> extraPieces = new ArrayList<Piece>();
+
         //System.out.println();
         //.println("SELECTED TILE ROW: " + selectedTile.getRow() + " SELECTED TILE COLUMN: " + selectedTile.getColumn());
         //System.out.println("ROW: " + row + " COL: " + col);
@@ -713,11 +762,20 @@ public class Board extends Group {
         if (selectedTile.getPiece().getName().equals("Pawn")) {
             if (Math.abs(row - selectedTile.getRow()) == 2) {
                 Pawn pawn = (Pawn) selectedTile.getPiece();
+                affectedPieces.add(pawn);
+                pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
                 pawn.set_en_passant(true);
             } else if (Math.abs(row - selectedTile.getRow()) == 1 && Math.abs(col - selectedTile.getColumn()) == 1) {
                 if (!clone.getTile(row, col).isOccupied()) {
                     Pawn pawn = (Pawn) selectedTile.getPiece();
                     Tile tile = clone.getTile(selectedTile.getRow(), col);
+                    Pawn opponentPawn = (Pawn) clone.getTile(row, selectedTile.getColumn()).getPiece();
+
+                    affectedPieces.add(opponentPawn);
+                    affectedPieces.add(pawn);
+
+                    pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
+                    pieceInformation.add(saveInformation(opponentPawn, opponentPawn.row, opponentPawn.col));
 
                     tile.setOccupied(false);
                     selectedTile.setOccupied(false);
@@ -726,9 +784,12 @@ public class Board extends Group {
 
                 }
 
-                if (row == 7) {
 
+                else if (row == 7) {
+                    Pawn pawn = (Pawn) selectedTile.getPiece();
 
+                    pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
+                    affectedPieces.add(pawn);
                     Tile tile = clone.getTile(row, col);
 
                     tile.setOccupied(true);
@@ -737,11 +798,18 @@ public class Board extends Group {
                     Queen queen = new Queen(7, col, "white");
                     tile.setPiece(queen);
 
+                    extraPieces.add(queen);
+                    promotionPiece = (saveInformation(queen, queen.row, queen.col));
                     moveDone = true;
 
 
                 } else if (row == 0) {
 
+                    Pawn pawn = (Pawn) selectedTile.getPiece();
+
+                    pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
+
+                    affectedPieces.add(selectedTile.getPiece());
 
                     Tile tile = clone.getTile(row, col);
 
@@ -750,6 +818,8 @@ public class Board extends Group {
 
                     Queen queen = new Queen(0, col, "black");
                     tile.setPiece(queen);
+                    extraPieces.add(queen);
+                    promotionPiece = (saveInformation(queen, queen.row, queen.col));
 
                     moveDone = true;
 
@@ -758,6 +828,11 @@ public class Board extends Group {
             }
             if (row == 7) {
 
+                Pawn pawn = (Pawn) selectedTile.getPiece();
+
+                pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
+
+                affectedPieces.add(selectedTile.getPiece());
 
                 Tile tile = clone.getTile(row, col);
 
@@ -767,11 +842,19 @@ public class Board extends Group {
                 Queen queen = new Queen(7, col, "white");
                 tile.setPiece(queen);
 
+                extraPieces.add(queen);
+                promotionPiece = (saveInformation(queen, queen.row, queen.col));
+
                 moveDone = true;
 
 
             } else if (row == 0) {
 
+                Pawn pawn = (Pawn) selectedTile.getPiece();
+
+                pieceInformation.add(saveInformation(pawn, pawn.row, pawn.col));
+
+                affectedPieces.add(selectedTile.getPiece());
 
                 Tile tile = clone.getTile(row, col);
 
@@ -780,6 +863,9 @@ public class Board extends Group {
 
                 Queen queen = new Queen(0, col, "black");
                 tile.setPiece(queen);
+                promotionPiece = (saveInformation(queen, queen.row, queen.col));
+
+                extraPieces.add(queen);
 
                 moveDone = true;
 
@@ -791,19 +877,29 @@ public class Board extends Group {
         if (selectedTile.getPiece().getName().equals("Rook")) {
 
             Rook rook = (Rook) selectedTile.getPiece();
+            pieceInformation.add(saveInformation(rook, rook.row, rook.col));
+            affectedPieces.add(rook);
             rook.setCastle(false);
         }
         if (selectedTile.getPiece().getName().equals("King")) {
 
             King king = (King) selectedTile.getPiece();
+            affectedPieces.add(king);
+
+            pieceInformation.add(saveInformation(king, king.row, king.col));
 
             if (king.canCastle) {
+
+
+
                 king.setCastle(false);
 
                 if (king.getColor().equals("white")) {
                     if (row == 0 && col == 6) {
                         Tile tile = clone.getTile(0, 7);
                         Rook rook = (Rook) clone.getTile(0, 7).getPiece();
+
+                        affectedPieces.add(rook);
 
                         tile.setOccupied(false);
 
@@ -828,6 +924,7 @@ public class Board extends Group {
                         Tile tile = clone.getTile(0, 0);
                         Rook rook = (Rook) clone.getTile(0, 0).getPiece();
 
+                        affectedPieces.add(rook);
 
                         tile.setOccupied(false);
                         selectedTile.setOccupied(false);
@@ -852,9 +949,8 @@ public class Board extends Group {
                     if (row == 7 && col == 6) {
                         Tile tile = clone.getTile(7, 7);
                         Rook rook = (Rook) clone.getTile(7, 7).getPiece();
-                        if (rook == null) {
-                            System.out.println("FOUND BUG");
-                        }
+
+                        affectedPieces.add(rook);
 
                         tile.setOccupied(false);
                         selectedTile.setOccupied(false);
@@ -875,8 +971,12 @@ public class Board extends Group {
 
 
                     } else if (row == 7 && col == 2) {
+
+
                         Tile tile = clone.getTile(7, 0);
                         Rook rook = (Rook) clone.getTile(7, 0).getPiece();
+
+                        affectedPieces.add(rook);
 
                         tile.setOccupied(false);
                         selectedTile.setOccupied(false);
@@ -911,8 +1011,17 @@ public class Board extends Group {
 
         if (!moveDone) {
 
+            if (clone.getTile(row, col).isOccupied()) {
+                pieceInformation.add(saveInformation(clone.getTile(row, col).getPiece(), row, col));
+                affectedPieces.add(clone.getTile(row, col).getPiece());
+            }
+
 
             clone.getTile(row, col).setPiece(selectedTile.getPiece());
+
+            pieceInformation.add(saveInformation(selectedTile.getPiece(), selectedTile.getRow(), selectedTile.getColumn()));
+            affectedPieces.add(selectedTile.getPiece());
+
             clone.getTile(row, col).setOccupied(true);
             selectedTile.getPiece().setRow(row);
             selectedTile.getPiece().setCol(col);
@@ -929,6 +1038,9 @@ public class Board extends Group {
         }
 
         clone.setTurn(clone.getTurn() + 1);
+
+
+        System.out.println(pieceInformation);
 
 
 
